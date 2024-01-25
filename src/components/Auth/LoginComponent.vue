@@ -12,7 +12,7 @@
 
         </div>
         <button type="button" class="btn btn-primary" @click="request(email, password)">Войти</button>
-        <button type="button" class="btn btn-secondary ms-3" @click="router.go(-1)">Назад</button>
+        <button type="button" class="btn btn-secondary ms-3" @click="router.push({ name: 'home' })">Главная</button>
         <button type="button" class="btn btn-secondary ms-3" @click="qwe()">button</button>
     </form>
 </template>
@@ -21,11 +21,11 @@
 <script setup>
 import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router'
-import { useAlertsStore } from '@/stores/store.js';
+import { useAuthStore } from '@/stores/authStore.js';
 import { validationMixin } from '@/services/mixins/validationMixin';
 
 const router = useRouter()
-const { login, getDataUser } = useAlertsStore();
+const { login, getDataUser } = useAuthStore();
 
 const email = ref('');
 const password = ref('');

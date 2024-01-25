@@ -21,7 +21,7 @@
       <span class="text-danger">{{ messagePasswordConf }}</span>
     </div>
     <button type="button" class="btn btn-primary" @click="request(name, email, password)">Отправить</button>
-    <button type="button" class="btn btn-secondary ms-3" @click="router.go(-1)">Назад</button>
+    <button type="button" class="btn btn-secondary ms-3" @click="router.push({ name: 'home' })">Главная</button>
   </form>
   {{ getUser }}
   {{ getToken }}
@@ -30,11 +30,11 @@
 import { ref, watch } from 'vue';
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
-import { useAlertsStore } from '@/stores/store.js';
+import { useAuthStore } from '@/stores/authStore.js';
 import { validationMixin } from '@/services/mixins/validationMixin';
 
-const { getUser, getToken } = storeToRefs(useAlertsStore());
-const { register } = useAlertsStore();
+const { getUser, getToken } = storeToRefs(useAuthStore());
+const { register } = useAuthStore();
 const router = useRouter()
 
 const name = ref('');
@@ -70,9 +70,9 @@ watch(passwordConf, newValue => {
 
 
 const request = (name, email, pass) => {
-//   if (name === '' || email === '' || pass === '' || messageName.value !== null || messageEmail.value !== null || messagePassword.value !== null || messagePasswordConf.value !== null) {
-//     return
-//   }
+  //   if (name === '' || email === '' || pass === '' || messageName.value !== null || messageEmail.value !== null || messagePassword.value !== null || messagePasswordConf.value !== null) {
+  //     return
+  //   }
 
   const data = {
     'name': name,

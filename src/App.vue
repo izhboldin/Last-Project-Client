@@ -1,54 +1,30 @@
 
 <template>
   <section v-if="route.name !== 'register' && route.name !== 'login'">
-    <header>
-      <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <div class="container">
-          <a class="navbar-brand" href="#">buy-sale</a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ms-auto">
-              <li class="nav-item">
-                <a class="nav-link" href="#">Home</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">Categories</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">Sell</a>
-              </li>
-              <li class="nav-item">
-                <router-link class="nav-link"
-                :to="{ name: 'login' }">login</router-link>⠀
-              </li>
-              <li class="nav-item">
-                <a class="nav-link btn btn-warning text-dark" href="#">Post a Free Ad</a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </nav>
-    </header>
+    <HeaderView></HeaderView>
   </section>
-
-
-
   <RouterView />
 </template>
 <script setup>
 
-import { ref } from 'vue';
-import { RouterLink, RouterView, useRoute } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
-import { useAlertsStore } from '@/stores/store.js';
+import { ref, onMounted } from 'vue'
+import HeaderView from './views/HeaderView.vue';
+import { RouterView, useRoute } from 'vue-router'
+import { useAuthStore } from '@/stores/authStore.js';
 
+const { getDataUser } = useAuthStore();
 const route = useRoute();
-const name = ref(null)
-const { getDate } = useAlertsStore();
+const name = ref('qwe')
+
+onMounted(() => {
+  getDataUser()
+})
 
 </script>
 
-<style scoped></style>
+<style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;500;600;700;800&display=swap');
+*{
+  font-family: 'Open Sans', sans-serif;
+}
+</style>

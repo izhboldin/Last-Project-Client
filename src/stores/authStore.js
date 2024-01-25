@@ -1,11 +1,10 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue'
 import axiosInstance from '@/services/axios.js';
-import { useRouter } from 'vue-router'
 import Cookies from 'js-cookie';
 
 
-export const useAlertsStore = defineStore('alerts', () => {
+export const useAuthStore = defineStore('alerts', () => {
     const user = ref(null);
     const token = ref(null);
 
@@ -16,7 +15,6 @@ export const useAlertsStore = defineStore('alerts', () => {
         try {
             let result = await axiosInstance.post('/api/register', date);
 
-            console.log(result);
             if (result.data.user && result.data.token) {
                 user.value = result.data.user;
                 token.value = result.data.token;
@@ -31,11 +29,11 @@ export const useAlertsStore = defineStore('alerts', () => {
         try {
             let result = await axiosInstance.post('/api/login', date);
 
-            // if(result.data.user && result.data.token){
-            //   user.value = result.data.user;
-            //   token.value = result.data.token;
-            // }
-            console.log(result);
+            if (result.data.user && result.data.token) {
+                user.value = result.data.user;
+                token.value = result.data.token;
+                Cookies.set('token', token.value);
+            }
         } catch (error) {
             console.error("Произошла ошибка при выполнении запроса:", error);
         }
@@ -56,12 +54,8 @@ export const useAlertsStore = defineStore('alerts', () => {
                     },
                 });
             user.value = result.data;
-            // if(result.data.user && result.data.token){
-            //   user.value = result.data.user;
-            //   token.value = result.data.token;
-            // }
-            console.log(result.data);
-            console.log(user.value);
+            // console.log(result.data);
+            // console.log(user.value);
             // const router = useRouter();
         } catch (error) {
             console.error("Произошла ошибка при выполнении запроса:", error);

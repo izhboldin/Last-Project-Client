@@ -6,7 +6,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: () => import('../views/HomeView.vue')
+      component: () => import('@/components/HomeComponent.vue')
     },
     {
       path: '/auth',
@@ -26,9 +26,36 @@ const router = createRouter({
       ]
     },
     {
-      path: '/about',
-      name: 'about',
-      component: () => import('../views/AboutView.vue')
+      path: '/your-products',
+      name: 'your-products',
+      component: () => import('@/components/Product/YourProductsComponent.vue'),
+      children: [
+        {
+          path: '/your-products/active',
+          name: 'yourActiveProducts',
+          component: () => import('@/components/Product/YourActiveProductsComponent.vue'),
+        },
+        {
+          path: '/your-products/wait',
+          name: 'yourWaitProducts',
+          component: () => import('@/components/Product/YourWaitProductsComponent.vue'),
+        },
+        {
+          path: '/your-products/not-active',
+          name: 'yourNotActiveProducts',
+          component: () => import('@/components/Product/YourNotActiveProductsComponent.vue'),
+        },
+        {
+          path: '/your-products/reject',
+          name: 'yourRejectProducts',
+          component: () => import('@/components/Product/YourRejectProductsComponent.vue'),
+        },
+      ]
+    },
+    {
+      path: '/create-products',
+      name: 'createProducts',
+      component: () => import('@/components/Product/CreateProductsComponent.vue'),
     }
   ]
 })
