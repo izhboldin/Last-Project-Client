@@ -5,23 +5,20 @@ import Cookies from 'js-cookie';
 
 
 export const useCreateCategory = defineStore('Category', () => {
-    const categories = ref([]);
+    const product = ref(null)
 
-    const getCategories = computed(() => categories.value)
+    const getProduct = computed(() => product.value)
 
     const getDataCategory = async () => {
         try {
-            let result = await axiosInstance.get('api/categories');
-            categories.value = result.data[0];
+            let result = await axiosInstance.get('api/categories/get');
+            categories.value = result.data;
             console.log(result.data);
             console.log(categories.value);
         } catch (error) {
             console.error("Произошла ошибка при выполнении запроса:", error);
         }
     }
-
     return {
-        getCategories,
-        getDataCategory,
     }
 })

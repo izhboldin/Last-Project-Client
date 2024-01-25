@@ -7,10 +7,12 @@ import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate';
 import App from './App.vue'
 import router from "@/router/router.js";
+import PrimeVue from 'primevue/config';
 
 
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap/dist/js/bootstrap.js'
+import 'primevue/resources/themes/aura-light-green/theme.css'
 
 const pinia = createPinia()
 const app = createApp(App)
@@ -20,7 +22,7 @@ pinia.use(({ store }) => {
 	store.router = markRaw(router)
 })
 
-
+app.use(PrimeVue);
 app.use(VueAxios, axios)
 app.use(pinia)
 app.use(router)
