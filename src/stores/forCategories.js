@@ -24,7 +24,7 @@ export const useForCategory = defineStore('forCategory', () => {
 
     const getDataCategories = async (data) => {
         try {
-            let result = await axiosInstance.get(`api/categories/${data}`);
+            let result = await axiosInstance.get(`api/categories/${data}?is_parent_category = true`);
             if (result.data.length === 0) {
                 return
             }

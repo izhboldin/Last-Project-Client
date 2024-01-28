@@ -8,6 +8,10 @@
                 <div class="form-text">обязательно*</div>
                 <input type="email" class="form-control">
             </div>
+            <pre>
+                {{ categories }}
+            </pre>
+
             <div class="mb-1">
                 <label for="exampleInputPassword1" class="form-label">Укажите Категорию</label>
                 <div class="form-text">обязательно*</div>
@@ -22,7 +26,7 @@
                             data-bs-target="#exampleModal">Изменить</button>
                     </div>
                 </div>
-                <!-- <pre>{{ chooseCategory }}</pre> -->
+                <pre>{{ chooseCategory }}</pre>
             </div>
         </div>
         <div class="container bg-body p-4 mb-2">
@@ -53,8 +57,8 @@
                 </select>
             </div>
             <div class="card flex justify-content-center">
-                <MultiSelect v-model="selectedCities" :options="cities" optionLabel="name" placeholder="Select Cities"
-                    :maxSelectedLabels="3" class="w-full md:w-20rem" />
+                <MultiSelect v-model="selectedCities" :options="chooseCategory.parameters" optionLabel="name"
+                    placeholder="Select Cities" :maxSelectedLabels="3" class="w-full md:w-20rem" />
             </div>
             {{ selectedCities }}
         </div>
