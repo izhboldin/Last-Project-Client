@@ -15,6 +15,7 @@ export const useAuthStore = defineStore('alerts', () => {
         try {
             let result = await axiosInstance.post('/api/register', date);
 
+            console.log(result);
             if (result.data.user && result.data.token) {
                 user.value = result.data.user;
                 token.value = result.data.token;

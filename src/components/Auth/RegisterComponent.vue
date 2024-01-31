@@ -31,7 +31,7 @@ import { ref, watch } from 'vue';
 import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore.js';
-import { validationMixin } from '@/services/mixins/validationMixin';
+import { validationMixin } from '@/services/mixins/validationMixin.js';
 
 const { getUser, getToken } = storeToRefs(useAuthStore());
 const { register } = useAuthStore();
@@ -70,9 +70,9 @@ watch(passwordConf, newValue => {
 
 
 const request = (name, email, pass) => {
-  //   if (name === '' || email === '' || pass === '' || messageName.value !== null || messageEmail.value !== null || messagePassword.value !== null || messagePasswordConf.value !== null) {
-  //     return
-  //   }
+    // if (name === '' || email === '' || pass === '' || messageName.value !== null || messageEmail.value !== null || messagePassword.value !== null || messagePasswordConf.value !== null) {
+    //   return
+    // }
 
   const data = {
     'name': name,

@@ -6,7 +6,8 @@
             <div class="mb-3">
                 <label for="exampleInputEmail1" class="form-label">Укажите название</label>
                 <div class="form-text">обязательно*</div>
-                <input type="email" class="form-control">
+                <input v-model="name" type="text" class="form-control">
+                <span class="text-danger">{{ messageName }}</span>
             </div>
             <div class="mb-1">
                 <label for="exampleInputPassword1" class="form-label">Укажите Категорию</label>
@@ -24,9 +25,7 @@
                 </div>
                 <pre>{{ category }}</pre>
             </div>
-            <pre>
-                    <!-- {{ currentCategory }} -->
-                </pre>
+            <!-- <pre>{{ currentCategory }}</pre> -->
         </div>
 
         <div class="container bg-body p-4 mb-2">
@@ -36,32 +35,38 @@
         <div class="container bg-body p-4 mb-2">
             <div class="mb-3">
                 <div class="form-text">Описание*</div>
-                <textarea type="text" class="form-control"></textarea>
+                <textarea v-model="description" type="text" class="form-control"></textarea>
+                <span class="text-danger">{{ messageDescription }}</span>
             </div>
         </div>
 
         <div v-if="category !== null" class="container bg-body p-4 mb-2">
             <div class="form-text">Цена*</div>
-            <div class="input-group mb-3">
+            <div class="input-group">
                 <span class="input-group-text">грн</span>
-                <input type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
+                <input v-model="price" type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
             </div>
+            <span class="text-danger">{{ messagePrice }}</span>
         </div>
 
-        <div v-if="category !== null" class="container bg-body p-4 mb-2">
+        <div v-if="category !== null && category.parameters.length" class="container bg-body p-4 mb-2">
             <h5 for="exampleInputPassword1" class="form-label">Дополнительная информация</h5>
             <div v-for="parameter in category.parameters" class="mb-3">
                 <div class="form-text">{{ parameter.name }}</div>
-                <select v-if="parameter.type == 'select'" type="text" class="form-control">
-                    <option v-for="option in parameter.options">{{ option.name }}</option>
+                <select v-if="parameter.type == 'select'" v-model="selectValue[parameter.id]" type="text"
+                    class="form-control">
+                    <option v-for="option in parameter.options" :value="option.id">{{ option.name }}</option>
                 </select>
                 <div v-if="parameter.type == 'multiselect'" class="card flex justify-content-center">
                     <MultiSelect v-model="multiselectValue[parameter.id]" :options="parameter.options" optionLabel="name"
-                        :placeholder="parameter.options[0].name" :maxSelectedLabels="30" class="w-full md:w-20rem" />
+                        placeholder="" :maxSelectedLabels="30" class="w-full md:w-20rem" />
                 </div>
             </div>
-            <pre>
+            <pre>multiselectValue: 
                     {{ multiselectValue }}
+                </pre>
+            <pre>selectValue: 
+                    {{ selectValue }}
                 </pre>
         </div>
 
@@ -76,18 +81,19 @@
             <div class="mb-3">
                 <label for="exampleInputPassword1" class="form-label">Контактная информация</label>
                 <div class="form-text">Email-адрес</div>
-                <input v-if="getUser" v-bind:value="getUser.email" type="text" class="form-control">
+                <input v-if="getUser" v-bind:value="getUser.email" type="text" class="form-control" disabled>
                 <input v-if="!getUser" type="text" class="form-control">
             </div>
             <div class="mb-1">
                 <div class="form-text">Номер телефона</div>
-                <InputMask id="phone" class="form-control" v-model="phone" mask="(999) 999-9999"
-                    placeholder="(999) 999-9999" />
+                <InputMask id="phone" class="form-control" v-model="phone" mask="999-999-9999" placeholder="999-999-9999" />
             </div>
         </div>
 
-        <div class="container bg-body p-4">
-            <button type="submit" class="btn btn-primary">отправить</button>
+        <div class="container bg-body pt-4 pb-2">
+            <button type="submit" class="btn btn-primary"
+                @click="checkBeforeCreation(name, category, description, price, multiselectValue, selectValue)">отправить</button>
+            <p class="text-danger">{{ messageCheck }}</p>
         </div>
     </div>
 
@@ -115,22 +121,18 @@
                             </div>
                             <div class="card-body d-flex justify-content-between p-1">
                                 <button v-if="category.children.length !== 0" class="btn btn-outline-primary btn-sm"
-                                    @click="receive(category.children, category.parent_category_id)">Далее {{ category.id
-                                    }}</button>
-                                <button v-if="category.parent_category_id !== null" class="btn btn-outline-success btn-sm"
+                                    @click="receive(category.children, category.parent_category_id)">Далее</button>
+                                <button v-if="category.parent_category_id !== null && category.children.length === 0" class="btn btn-outline-success btn-sm"
                                     @click="getDataCategory(category.id)" aria-label="Close"
                                     data-bs-dismiss="modal">Выбрать</button>
-
                             </div>
                         </div>
 
                     </div>
 
-                    <pre>
-                        <!-- {{ categories.length > 0 ? categories[0]["parent_category_id"] : 'Нет категорий' }} -->
-
-                        <!-- {{ categories[0]?["parent_category_id"]  }} -->
-                    </pre>
+                    <!-- <pre>
+                        {{ categories.length > 0 ? categories[0]["parent_category_id"] : 'Нет категорий' }}
+                    </pre> -->
                 </div>
                 <!-- <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -146,28 +148,63 @@ import { ref, onMounted, watch } from 'vue'
 import { RouterView, useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/stores/authStore.js';
-import { useForCategory } from '@/stores/forCategories.js';
 import axiosInstance from '@/services/axios.js';
+import { productValidMixin } from '@/services/mixins/productValidMixin.js';
+
+
 
 import MultiSelect from 'primevue/multiselect';
-const multiselectValue = ref({});
-const cities = ref([
-    { name: 'New York'},
-    { name: 'Rome'},
-    { name: 'London'},
-    { name: 'Istanbul'},
-    { name: 'Paris'}
-]);
 import InputMask from 'primevue/inputmask';
-const phone = ref(null);
+const multiselectValue = ref({});
+const selectValue = ref({});
 
-const { getUser } = storeToRefs(useAuthStore());
+const { getUser, getToken } = storeToRefs(useAuthStore());
 const route = useRoute();
 const parentId = ref(null);
 const currentParentId = ref(null);
 const categories = ref(null);
 const currentCategory = ref(null);
 const category = ref(null);
+
+const name = ref('');
+const description = ref('');
+const price = ref('');
+const phone = ref('');
+
+const messageName = ref(null);
+const messageDescription = ref(null);
+const messagePrice = ref(null);
+const messagePhone = ref(null);
+const messageCheck = ref(null);
+
+watch(category, newValue => {
+    multiselectValue.value = {};
+    selectValue.value = {};
+    newValue.parameters.forEach(element => {
+        if (element.type === 'multiselect') {
+            // console.log(123);
+            multiselectValue.value[`${element.id}`] = [];
+        }
+        if (element.type === 'select') {
+            selectValue.value[`${element.id}`] = '';
+        }
+        console.log(element.id, element.type);
+    });
+})
+
+watch(name, newValue => {
+    return messageName.value = productValidMixin.validName(newValue);
+})
+watch(description, newValue => {
+    return messageDescription.value = productValidMixin.validDescription(newValue);
+})
+watch(price, newValue => {
+    return messagePrice.value = productValidMixin.validPrice(newValue);
+})
+watch(phone, newValue => {
+    return messagePhone.value = productValidMixin.validPhone(newValue);
+})
+
 
 const getAllCategories = async () => {
     try {
@@ -230,7 +267,66 @@ const searchCategories = (categories) => {
         }
     });
 }
+
+const checkBeforeCreation = (name, category, description, price, multiselect, select) => {
+    if (name == '' || description == '' || category == null) {
+        return messageCheck.value = 'Заполние важные поля';
+    }
+    if (price == '') {
+        return messageCheck.value = 'Введите стоимость объявления';
+    }
+
+    let options = [];
+    console.log(multiselect);
+    for (const key in multiselect) {
+        if (multiselect[key].length === 0) {
+            return messageCheck.value = 'Заполните всю дополнительну информацию1';
+        } else {
+            multiselect[key].forEach(el => {
+                options.push(el.id);
+            })
+        }
+    }
+    for (const key in select) {
+        if (select[key].length === 0) {
+            return messageCheck.value = 'Заполните всю дополнительну информацию2';
+        } else {
+            options.push(select[key]);
+        }
+    }
+    messageCheck.value = ''
+
+console.log('класс');
+
+    const data = {
+        'title': name,
+        'user_id': getUser.id,
+        'description': description,
+        'price': price,
+        'category_id': category.id,
+        'options': options,
+    }
+    console.log(data);
+    createProduct(data);
+}
+
+const createProduct = async (data) => {
+    try {
+        let result = await axiosInstance.post('api/products', data, {
+            headers: {
+                'Authorization': `Bearer ${getToken.value}`,
+            }
+        });
+
+        category.value = result.data.data;
+        console.log(result.data);
+        console.log(category.value);
+    } catch (error) {
+        console.error("Произошла ошибка при выполнении запроса:", error);
+    }
+}
 onMounted(() => {
+
     getAllCategories();
 });
 </script>
