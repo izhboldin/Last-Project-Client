@@ -23,7 +23,7 @@
                             data-bs-target="#exampleModal">Изменить</button>
                     </div>
                 </div>
-                <pre>{{ category }}</pre>
+                <!-- <pre>{{ category }}</pre> -->
             </div>
             <!-- <pre>{{ currentCategory }}</pre> -->
         </div>
@@ -62,12 +62,8 @@
                         placeholder="" :maxSelectedLabels="30" class="w-full md:w-20rem" />
                 </div>
             </div>
-            <pre>multiselectValue: 
-                    {{ multiselectValue }}
-                </pre>
-            <pre>selectValue: 
-                    {{ selectValue }}
-                </pre>
+            <!-- <pre>multiselectValue: {{ multiselectValue }}</pre>
+            <pre>selectValue: {{ selectValue }}</pre> -->
         </div>
 
         <div class="container bg-body p-4 mb-2">
@@ -214,8 +210,6 @@ const getAllCategories = async () => {
         }
         categories.value = result.data.data;
         currentCategory.value = result.data.data;
-        console.log(result.data);
-        console.log(categories.value);
     } catch (error) {
         console.error("Произошла ошибка при выполнении запроса:", error);
     }
@@ -269,6 +263,10 @@ const searchCategories = (categories) => {
 }
 
 const checkBeforeCreation = (name, category, description, price, multiselect, select) => {
+if(messageName.value != null || messageDescription.value != null || messagePrice.value != null || messagePhone.value != null)
+{
+    return messageCheck.value = 'Проверьте все поля на правильность введения';
+}
     if (name == '' || description == '' || category == null) {
         return messageCheck.value = 'Заполние важные поля';
     }
@@ -303,6 +301,7 @@ console.log('класс');
         'user_id': getUser.id,
         'description': description,
         'price': price,
+        'status': 'wait',
         'category_id': category.id,
         'options': options,
     }
@@ -318,9 +317,7 @@ const createProduct = async (data) => {
             }
         });
 
-        category.value = result.data.data;
         console.log(result.data);
-        console.log(category.value);
     } catch (error) {
         console.error("Произошла ошибка при выполнении запроса:", error);
     }

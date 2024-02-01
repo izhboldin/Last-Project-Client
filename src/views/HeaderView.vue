@@ -15,7 +15,7 @@
               </li>
               <li class="nav-item">
                 <router-link class="nav-link"
-                :to="{ name: 'your-products' }">yourProduct</router-link>
+                :to="{ name: 'yourActiveProducts' }">yourProduct</router-link>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="#">Sell</a>
@@ -27,6 +27,9 @@
               <li class="nav-item">
                 <a class="nav-link btn btn-warning text-dark" href="#">Post a Free Ad</a>
               </li>
+              <li class="nav-item">
+                <span class="nav-link" v-if="getUser">Привет,  {{getUser.name}}</span>
+              </li>
             </ul>
           </div>
         </div>
@@ -35,8 +38,11 @@
 </template>
 <script setup>
 import { useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
+import { useAuthStore } from '@/stores/authStore.js';
 
 const router = useRouter()
+const { getUser} = storeToRefs(useAuthStore());
 
 </script>
 <style lang="">

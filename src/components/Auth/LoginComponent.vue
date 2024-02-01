@@ -13,7 +13,7 @@
         </div>
         <button type="button" class="btn btn-primary" @click="request(email, password)">Войти</button>
         <button type="button" class="btn btn-secondary ms-3" @click="router.push({ name: 'home' })">Главная</button>
-        <button type="button" class="btn btn-secondary ms-3" @click="qwe()">button</button>
+        <!-- <button type="button" class="btn btn-secondary ms-3" @click="qwe()">button</button> -->
     </form>
 </template>
 
@@ -40,11 +40,11 @@ watch(password, newValue => {
     return messagePassword.value = validationMixin.validPassword(newValue)
 })
 
-const qwe = () =>{
-    getDataUser().then(() => {
-        router.push({ name: 'register' })
-    })
-}
+// const qwe = () =>{
+//     getDataUser().then(() => {
+//         router.push({ name: 'register' })
+//     })
+// }
 
 
 const request = (email, pass) => {
@@ -56,12 +56,13 @@ const request = (email, pass) => {
         console.log(messagePassword.value);
         return
     }
-
+    
     const data = {
         'email': email,
         'password': pass,
     }
     login(data)
+    router.push({ name: 'home' })
 }
 </script>
 <style lang="">
