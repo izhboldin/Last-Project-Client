@@ -1,6 +1,6 @@
 <template>
     <div>
-
+        <div v-if="products === null" class="text-center pt-3">Объявлений нет</div>
         <div v-for="product in products" class="bg-body p-3  mb-3 w-100">
             <div class="row g-0 justify-content-center">
 
@@ -16,8 +16,8 @@
                             <h6 class="card-title">Цена: {{product.price}}</h6>
                         </div>
                         <p class="card-text my-1"></p>
-                        <p class="card-text my-1"><small class="text-muted">Категория: Авто</small></p>
-                        <p class="card-text my-1" ><div class="d-flex align-items-center" v-for="option in product.options">
+                        <p class="card-text my-1"><small class="text-muted">Категория: {{product.category.name}}</small></p>
+                        <p class="card-text my-1 d-flex" ><div class="d-flex align-items-center" v-for="option in product.options">
                             <span class="material-symbols-outlined">chevron_right</span>
                             <small class="text-muted">{{ option.parameter.name }}: {{option.name }}. </small>
                         </div></p>

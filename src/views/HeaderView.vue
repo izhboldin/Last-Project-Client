@@ -2,27 +2,26 @@
         <header>
       <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
-          <a class="navbar-brand" href="#">buy-sale</a>
+          <router-link class="navbar-brand" :to="{ name: 'products' }">buy-sale</router-link>
           
           <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
               <li class="nav-item">
-                <a class="nav-link" href="#">Home</a>
+                <router-link class="nav-link"
+                :to="{ name: 'product', params: { id: 123 } }">объявление</router-link>
               </li>
               <li class="nav-item">
                 <router-link class="nav-link"
-                :to="{ name: 'createProducts' }">createProduct</router-link>
+                :to="{ name: 'createProducts' }">Создание объявления</router-link>
               </li>
               <li class="nav-item">
                 <router-link class="nav-link"
-                :to="{ name: 'yourActiveProducts' }">yourProduct</router-link>
+                :to="{ name: 'yourActiveProducts' }">Ваши объявления</router-link>
               </li>
-              <li class="nav-item">
-                <a class="nav-link" href="#">Sell</a>
-              </li>
+              
               <li class="nav-item">
                 <router-link class="nav-link"
-                :to="{ name: 'login' }">login</router-link>
+                :to="{ name: 'login' }">Войти</router-link>
               </li>
               <li class="nav-item">
                 <a class="nav-link btn btn-warning text-dark" href="#">Post a Free Ad</a>
@@ -46,5 +45,7 @@ const { getUser} = storeToRefs(useAuthStore());
 
 </script>
 <style lang="">
-    
+    /* body {
+      background-color: --bs-light-rgb
+    } */
 </style>

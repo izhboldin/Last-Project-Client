@@ -81,6 +81,7 @@ const request = (name, email, pass) => {
     'role': 'user'
   }
   register(data);
+  router.push({ name: 'home' })
 }
 
 </script>

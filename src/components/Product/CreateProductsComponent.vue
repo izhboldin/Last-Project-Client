@@ -103,37 +103,32 @@
                     <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body row">
-                    <button class="btn btn-outline-primary btn-sm mb-2" v-if="parentId !== null || !isNaN(parentId)"
+                <div class="modal-body">
+                    <button class="btn btn-outline-primary btn-sm mb-2 w-100" v-if="parentId !== null "
                         @click="getBack()">back</button>
 
-                    <div v-if="currentCategory !== null" class="row row-cols-3">
+                    <div v-if="currentCategory !== null" class="row g-2">
+                        
+                        <div v-for="category in currentCategory" class="col-4">
+                            <div  class="p-2 card">
+                                <img src="https://i.ucrazy.ru/files/pics/2023.10/2023-10-17-21-53-072.webp" class="card-img"
+                                    alt="..." style="max-height: 20vh; object-fit: cover">
+                                <div class="card-body p-1">
+                                    <h4 class="card-title text-center">{{ category.name }}</h4>
+                                </div>
+                                <div class="card-body d-flex justify-content-between p-1">
+                                    <button :disabled="category.children.length === 0" class="btn btn-outline-primary btn-sm"
+                                        @click="receive(category.children, category.parent_category_id)">Далее</button>
 
-                        <div v-for="category in currentCategory" class="col p-2 card">
-                            <img src="https://i.ucrazy.ru/files/pics/2023.10/2023-10-17-21-53-072.webp" class="card-img"
-                                alt="..." style="max-height: 20vh; object-fit: cover">
-                            <div class="card-body p-1">
-                                <h4 class="card-title text-center">{{ category.name }}</h4>
-                            </div>
-                            <div class="card-body d-flex justify-content-between p-1">
-                                <button v-if="category.children.length !== 0" class="btn btn-outline-primary btn-sm"
-                                    @click="receive(category.children, category.parent_category_id)">Далее</button>
-                                <button v-if="category.parent_category_id !== null && category.children.length === 0" class="btn btn-outline-success btn-sm"
-                                    @click="getDataCategory(category.id)" aria-label="Close"
-                                    data-bs-dismiss="modal">Выбрать</button>
+                                    <button v-if="category.parent_category_id !== null && category.children.length === 0"
+                                        class="btn btn-outline-success btn-sm" @click="getDataCategory(category.id)"
+                                        aria-label="Close" data-bs-dismiss="modal">Выбрать</button>
+                                </div>
                             </div>
                         </div>
 
                     </div>
-
-                    <!-- <pre>
-                        {{ categories.length > 0 ? categories[0]["parent_category_id"] : 'Нет категорий' }}
-                    </pre> -->
                 </div>
-                <!-- <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div> -->
             </div>
         </div>
     </div>
@@ -141,7 +136,7 @@
 
 <script setup>
 import { ref, onMounted, watch } from 'vue'
-import { RouterView, useRoute } from 'vue-router'
+import { RouterView, useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/stores/authStore.js';
 import axiosInstance from '@/services/axios.js';
@@ -156,6 +151,8 @@ const selectValue = ref({});
 
 const { getUser, getToken } = storeToRefs(useAuthStore());
 const route = useRoute();
+const router = useRouter()
+
 const parentId = ref(null);
 const currentParentId = ref(null);
 const categories = ref(null);
@@ -208,8 +205,8 @@ const getAllCategories = async () => {
         if (result.data.length === 0) {
             return
         }
-        categories.value = result.data.data;
-        currentCategory.value = result.data.data;
+        categories.value = result.data;
+        currentCategory.value = result.data;
     } catch (error) {
         console.error("Произошла ошибка при выполнении запроса:", error);
     }
@@ -237,6 +234,7 @@ const receive = (category, parId) => {
 
 const getBack = () => {
     if (parentId.value == 0) {
+        parentId.value = null;
         return currentCategory.value = categories.value;
     }
     categories.value.forEach(category => {
@@ -255,7 +253,6 @@ const searchCategories = (categories) => {
             return 0;
         }
         if (category.children) {
-            console.log(category);
             currentParentId.value = category.parent_category_id
             searchCategories(category.children);
         }
@@ -263,10 +260,9 @@ const searchCategories = (categories) => {
 }
 
 const checkBeforeCreation = (name, category, description, price, multiselect, select) => {
-if(messageName.value != null || messageDescription.value != null || messagePrice.value != null || messagePhone.value != null)
-{
-    return messageCheck.value = 'Проверьте все поля на правильность введения';
-}
+    if (messageName.value != null || messageDescription.value != null || messagePrice.value != null || messagePhone.value != null) {
+        return messageCheck.value = 'Проверьте все поля на правильность введения';
+    }
     if (name == '' || description == '' || category == null) {
         return messageCheck.value = 'Заполние важные поля';
     }
@@ -294,7 +290,7 @@ if(messageName.value != null || messageDescription.value != null || messagePrice
     }
     messageCheck.value = ''
 
-console.log('класс');
+    console.log('класс');
 
     const data = {
         'title': name,
@@ -307,6 +303,8 @@ console.log('класс');
     }
     console.log(data);
     createProduct(data);
+    router.push({ name: 'yourWaitProducts' })
+
 }
 
 const createProduct = async (data) => {
@@ -323,7 +321,6 @@ const createProduct = async (data) => {
     }
 }
 onMounted(() => {
-
     getAllCategories();
 });
 </script>
