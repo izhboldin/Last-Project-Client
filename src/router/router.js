@@ -7,23 +7,16 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: () => import('@/components/HomeComponent.vue'),
-      children: [
-        {
-          path: '/product/:id',
-          name: 'product',
-          component: () => import('@/components/Product/ProductComponent.vue'),
-        },
-        {
-          path: '/products',
-          name: 'products',
-          component: () => import('@/components/MainComponent.vue'),
-        },
-        {
-          path: '/search',
-          name: 'search',
-          component: () => import('@/components/Product/SearchProductComponent.vue'),
-        },
-      ]
+    },
+    {
+      path: '/product/:id',
+      name: 'product',
+      component: () => import('@/components/Product/ProductComponent.vue'),
+    },
+    {
+      path: '/search',
+      name: 'search',
+      component: () => import('@/components/Product/SearchProductComponent.vue'),
     },
     {
       path: '/auth',

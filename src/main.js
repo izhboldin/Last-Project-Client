@@ -12,7 +12,7 @@ import PrimeVue from 'primevue/config';
 
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap/dist/js/bootstrap.js'
-import 'primevue/resources/themes/aura-light-green/theme.css'
+import 'primevue/resources/themes/aura-light-blue/theme.css'
 
 const pinia = createPinia()
 const app = createApp(App)

@@ -53,7 +53,7 @@
             <h5 for="exampleInputPassword1" class="form-label">Дополнительная информация</h5>
             <div v-for="parameter in category.parameters" class="mb-3">
                 <div class="form-text">{{ parameter.name }}</div>
-                <select v-if="parameter.type == 'select'" v-model="selectValue[parameter.id]" type="text"
+                <select v-if="parameter.type == 'select'" v-model="selectValue[parameter.id]"
                     class="form-control">
                     <option v-for="option in parameter.options" :value="option.id">{{ option.name }}</option>
                 </select>
@@ -104,20 +104,21 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <button class="btn btn-outline-primary btn-sm mb-2 w-100" v-if="parentId !== null "
+                    <button class="btn btn-outline-primary btn-sm mb-2 w-100" v-if="parentId !== null"
                         @click="getBack()">back</button>
 
                     <div v-if="currentCategory !== null" class="row g-2">
-                        
+
                         <div v-for="category in currentCategory" class="col-4">
-                            <div  class="p-2 card">
+                            <div class="p-2 card">
                                 <img src="https://i.ucrazy.ru/files/pics/2023.10/2023-10-17-21-53-072.webp" class="card-img"
                                     alt="..." style="max-height: 20vh; object-fit: cover">
                                 <div class="card-body p-1">
                                     <h4 class="card-title text-center">{{ category.name }}</h4>
                                 </div>
                                 <div class="card-body d-flex justify-content-between p-1">
-                                    <button :disabled="category.children.length === 0" class="btn btn-outline-primary btn-sm"
+                                    <button :disabled="category.children.length === 0"
+                                        class="btn btn-outline-primary btn-sm"
                                         @click="receive(category.children, category.parent_category_id)">Далее</button>
 
                                     <button v-if="category.parent_category_id !== null && category.children.length === 0"
@@ -274,7 +275,7 @@ const checkBeforeCreation = (name, category, description, price, multiselect, se
     console.log(multiselect);
     for (const key in multiselect) {
         if (multiselect[key].length === 0) {
-            return messageCheck.value = 'Заполните всю дополнительну информацию1';
+            return messageCheck.value = 'Заполните всю дополнительну информацию';
         } else {
             multiselect[key].forEach(el => {
                 options.push(el.id);
@@ -283,7 +284,7 @@ const checkBeforeCreation = (name, category, description, price, multiselect, se
     }
     for (const key in select) {
         if (select[key].length === 0) {
-            return messageCheck.value = 'Заполните всю дополнительну информацию2';
+            return messageCheck.value = 'Заполните всю дополнительну информацию';
         } else {
             options.push(select[key]);
         }
@@ -303,7 +304,6 @@ const checkBeforeCreation = (name, category, description, price, multiselect, se
     }
     console.log(data);
     createProduct(data);
-    router.push({ name: 'yourWaitProducts' })
 
 }
 
@@ -314,8 +314,8 @@ const createProduct = async (data) => {
                 'Authorization': `Bearer ${getToken.value}`,
             }
         });
-
         console.log(result.data);
+        router.push({ name: 'yourWaitProducts' })
     } catch (error) {
         console.error("Произошла ошибка при выполнении запроса:", error);
     }
