@@ -3,7 +3,7 @@ export class validationMixin {
     static isEmpty(data) {
         return (data === "" || data === null || data === undefined)
     }
-    static checkLength(data, min, max){
+    static checkLength(data, min, max) {
         return data.length < min || data.length > max
     }
 
@@ -14,7 +14,7 @@ export class validationMixin {
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
         return emailPattern.test(email) ? null : 'В поле email, есть ошибки'
     }
-    
+
     static validLogin(login) {
         if (validationMixin.isEmpty(login)) {
             return 'Напишите имя  (login)'
@@ -43,11 +43,21 @@ export class validationMixin {
         // if (!/[A-Z]/.test(password)) {
         //     return false;
         // }
-        
+
         // // Проверяем наличие специальных символов
         // if (!/[!@#$%^&*()_+{}\[\]:;<>,.?~\\-]/.test(password)) {
         //     return false;
         // }
+    }
+
+    static validPhone(phone) {
+        if (validationMixin.isEmpty(phone)) {
+            return 'Заполните поле'
+        }
+        if (phone.split('_').join('') !== phone) {
+            return 'Заполните поле правильно'
+        }
+        return null
     }
 
 

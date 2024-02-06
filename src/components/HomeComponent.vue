@@ -4,29 +4,31 @@
         <div class="container my-2">
             <div class="input-group">
                 <input type="text" class="form-control  p-3" placeholder="Recipient's username" v-model="search">
-                <button class="btn btn-info" type="button" id="button-addon2">Поиск</button>
+                <button class="btn btn-info" type="button"
+                    @click="router.push({ name: 'search', query: { 'search': search } })">Поиск</button>
             </div>
         </div>
-    </div>
-    <div class="w-100 bg-body mt-4">
-        <div class="container">
-            <div class="row g-3">
-
-                <div v-for="category in categories" class="col-2">
-                    <div class="p-3 text-center  bg-body">
-                        <img src="https://ireland.apollo.olxcdn.com:443/v1/files/zo9y2rkxi8941-UA/image;s=1000x700"
-                            class="img-fluid object-fit-cover rounded-circle" style="height: 120px; width: 120px;"
-                            alt="...">
-                        <h5 class="mt-2"><strong>{{ category.name }}</strong></h5>
+        <div class="w-100 bg-body mt-5 mb-3">
+            <div class="container">
+                <h2 class="text-center p-2">Разделы на категории </h2>
+                <div class="row g-3">
+                    <div v-for="category in categories" class="col-2">
+                        <div class="p-3 text-center  bg-body cursor-pointer"
+                            @click="router.push({ name: 'search', query: { 'categoryId': category.id } })">
+                            <img src="https://ireland.apollo.olxcdn.com:443/v1/files/zo9y2rkxi8941-UA/image;s=1000x700"
+                                class="img-fluid object-fit-cover rounded-circle" style="height: 120px; width: 120px;"
+                                alt="...">
+                            <h6 class="mt-2"><strong>{{ category.name }}</strong></h6>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <button type="button" class="form-control btn border" data-bs-toggle="modal" data-bs-target="#exampleModal">Выбрать
-        категорию</button>
+    <!-- <button type="button" class="form-control btn border" data-bs-toggle="modal" data-bs-target="#exampleModal">Выбрать
+        категорию</button> -->
 
-    <div class="modal fade modal-lg" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <!-- <div class="modal fade modal-lg" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -58,7 +60,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
 </template>
 <script setup>
 import { ref, onMounted, watch } from 'vue'
@@ -70,6 +72,8 @@ import { productValidMixin } from '@/services/mixins/productValidMixin.js';
 
 
 const categories = ref('');
+const deviceName = navigator.userAgent;
+const router = useRouter();
 
 const getAllCategories = async () => {
     try {
@@ -77,15 +81,20 @@ const getAllCategories = async () => {
         if (result.data.length === 0) {
             return
         }
-        categories.value = result.data.data;
+        categories.value = result.data;
+        console.log(categories.value);
     } catch (error) {
         console.error("Произошла ошибка при выполнении запроса:", error);
     }
 }
 
 onMounted(() => {
-
+console.log(deviceName);
     getAllCategories();
 });
 </script>
-<style></style>
+<style>
+.cursor-pointer {
+    cursor: pointer;
+}
+</style>

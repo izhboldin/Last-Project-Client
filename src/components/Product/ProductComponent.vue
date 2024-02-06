@@ -26,7 +26,7 @@
                         </div>
                         <div>
                             <h4><strong>Параметры</strong></h4>
-                            <p class="card-text my-1 d-flex">
+                            <p class="card-text my-1 d-flex flex-wrap">
                             <div class="d-flex align-items-center bg-light p-2 me-2" v-for="option in product.options">
                                 <span class="material-symbols-outlined">chevron_right</span>
                                 <small class="text-muted">{{ option.parameter.name }}: {{ option.name }}. </small>
@@ -43,7 +43,7 @@
                         <h5>{{ product.title }}</h5>
                         <h4><strong>{{ product.price }} грн.</strong></h4>
                         <button class="btn btn-outline-info w-100 mb-2" type="button">Написать</button>
-                        <button class="btn btn-outline-info w-100 mb-2" type="button">Показать телефон</button>
+                        <button class="btn btn-outline-info w-100 mb-2" type="button" @click="showPhone()">{{messagePhoneValue}}</button>
                         <button class="btn btn-info w-100" type="button">Купить</button>
                     </div>
                     <div class="p-3 bg-body mb-3">
@@ -83,13 +83,18 @@ import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/stores/authStore.js';
 import { format } from 'date-fns';
 
-const { getToken } = storeToRefs(useAuthStore());
+const { getUser, getToken } = storeToRefs(useAuthStore());
 const route = useRoute();
 const router = useRouter();
 
 const product = ref(null);
 const search = ref(null);
+const messagePhoneValue = ref('Показать телефон') 
 // const id = ref(route.params.id);
+
+const showPhone = () => {
+    messagePhoneValue.value = getUser.value.phone;
+}
 
 const getProduct = async (data) => {
     try {

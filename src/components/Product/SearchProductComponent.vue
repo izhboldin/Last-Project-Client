@@ -9,23 +9,37 @@
         <div v-if="categories" class="w-100">
             <div class="container">
                 <h4><strong>Фильтры</strong></h4>
-                <div class="row row-cols-2 row-cols-lg-5 g-3 g-lg-3">
+                <!-- <pre>{{ categories }}</pre> -->
+                <!-- <div class="row row-cols-2 row-cols-lg-5 g-3 g-lg-3"> -->
+                <div class="row g-3">
 
-                    <div class="col">
+                    <div class="col-5">
                         <div class="p-2 ">
                             <label for="exampleInputEmail1" class="form-label mb-0">Категория</label>
-                            <button v-if="!(route.query.categoryId)" class="form-control">Все категории</button>
-                            <button v-if="(route.query.categoryId)" class="form-control">{{ categories.name }}</button>
+                            <treeselect v-model="valueCategoryId" :multiple="false" :options="categoriesTree" />
+                            <!-- <button v-if="!(route.query.categoryId)" class="form-control">Все категории</button> -->
+                            <!-- <button v-if="(route.query.categoryId)" class="form-control">{{ categories.name }}</button> -->
                         </div>
                     </div>
-                    <div class="col">
+
+                    <div class="col-4">
                         <label for="exampleInputEmail1" class="form-label mb-0">Цена</label>
                         <div class="p-2  input-group">
                             <input type="number" class="form-control" placeholder="От:" v-model="priceMin">
                             <input type="number" class="form-control" placeholder="До:" v-model="priceMax">
                         </div>
                     </div>
-                    <div v-for="parameter in categories.parameters" class="col">
+                    <div class="col-3">
+                        <label for="exampleInputEmail1" class="form-label mb-0">Состояние</label>
+                        <div class="p-2  input-group">
+                            <select class="form-control" v-model="stateValue">
+                                <option value="">-</option>
+                                <option value="second-hand">Б/у</option>
+                                <option value="new">Новый</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div v-for="parameter in categories.parameters" class="col-3">
                         <label for="exampleInputEmail1" class="form-label mb-0">{{ parameter.name }}</label>
                         <div class="p-2  input-group">
                             <select v-if="parameter.type == 'select'" class="form-control"
@@ -57,6 +71,7 @@
                         </select>
                     </div>
                 </div>
+                <!-- <pre>{{ products }}</pre> -->
                 <div class="row g-2">
 
                     <div v-for="product in products" class="col-3 ">
@@ -86,6 +101,9 @@ import { useAuthStore } from '@/stores/authStore.js';
 import { format } from 'date-fns';
 import MultiSelect from 'primevue/multiselect';
 
+import Treeselect from 'vue3-treeselect'
+import 'vue3-treeselect/dist/vue3-treeselect.css'
+const categoriesTree = ref(null);
 
 const { getToken } = storeToRefs(useAuthStore());
 
@@ -93,11 +111,14 @@ const route = useRoute();
 const router = useRouter();
 
 const categories = ref(null);
+const valueCategoryId = ref(null);
+const allCategories = ref(null);
 const products = ref(null);
 const searchInput = ref(null);
 const priceMin = ref(null);
 const priceMax = ref(null);
 const searchValue = ref(null);
+const stateValue = ref(null);
 
 const multiselectValue = ref({});
 const selectValue = ref({});
@@ -106,7 +127,7 @@ const sort = ref('');
 watch(categories, newValue => {
     multiselectValue.value = {};
     selectValue.value = {};
-    if (Array.isArray(newValue)) {
+    if (Array.isArray(newValue) || !newValue) {
         return
     }
     newValue.parameters.forEach(element => {
@@ -118,10 +139,16 @@ watch(categories, newValue => {
         }
     });
 
-    if (route.query.options && categories.value.parameters) {
-        let optionsArr = route.query.options;
+    setOptionsFromQuery(route.query.options);
+
+
+})
+
+const setOptionsFromQuery = (queryOption) => {
+    if (queryOption && categories.value.parameters) {
+        let optionsArr = queryOption;
         if (!(Array.isArray(optionsArr))) {
-            optionsArr = [parseInt(route.query.options)]
+            optionsArr = [parseInt(queryOption)]
         }
         optionsArr = optionsArr.map(str => parseInt(str));
 
@@ -142,14 +169,54 @@ watch(categories, newValue => {
 
         })
     }
+}
 
-
+watch(allCategories, newValue => {
+    console.log(newValue);
+    categoriesTree.value = transformCategoriesTree(newValue);
 })
+
+watch(valueCategoryId, newValue => {
+    getCategories(newValue)
+    search()
+})
+
+const transformCategoriesTree = (categories) => {
+
+    if (Array.isArray(categories)) {
+        return categories.map(category => {
+            const transformedCategory = {
+                label: category.name,
+                id: category.id,
+                parent_category_id: category.parent_category_id,
+            };
+
+            if (category.children && category.children.length > 0) {
+                transformedCategory.children = transformCategoriesTree(category.children);
+            }
+
+            return transformedCategory;
+        });
+    } else {
+
+        const transformedCategory = {
+            label: categories.name,
+            id: categories.id,
+            parent_category_id: categories.parent_category_id,
+        };
+
+        if (categories.children && categories.children.length > 0) {
+            transformedCategory.children = transformCategoriesTree(categories.children);
+        }
+
+        return [transformedCategory]
+    }
+}
 
 const search = () => {
     let query = {};
-    if (categories.value) {
-        query.categoryId = categories.value.id;
+    if (valueCategoryId.value) {
+        query.categoryId = valueCategoryId.value;
     }
     if (priceMin.value) {
         query.minPrice = priceMin.value;
@@ -160,6 +227,9 @@ const search = () => {
     if (searchValue.value) {
         query.search = searchValue.value;
     }
+    if (stateValue.value) {
+        query.state = stateValue.value;
+    }
     if (sort.value) {
         let sortArr = sort.value.split('=');
         if (sortArr[0] == "date") {
@@ -169,6 +239,7 @@ const search = () => {
             query.price = sortArr[1];
         }
     }
+
 
     query.options = [];
     for (const key in multiselectValue.value) {
@@ -185,6 +256,12 @@ const search = () => {
             query.options.push(selectValue.value[key]);
         }
     }
+    
+    if (query.options.length == 0) {
+        query.options = route.query.options;
+        console.log(query.options);
+    }
+
     getProducts(query)
 
     router.push({
@@ -194,7 +271,15 @@ const search = () => {
 }
 
 const getQuery = (query) => {
-    console.log(query);
+
+
+    if (query.categoryId) {
+        valueCategoryId.value = query.categoryId;
+    }
+    if (query.option) {
+        setOptionsFromQuery(query.option);
+    }
+
     query.categoryId ? getCategories(query.categoryId) : getCategories()
 
     if (query.maxPrice) {
@@ -213,7 +298,9 @@ const getQuery = (query) => {
     if (query.search) {
         searchValue.value = query.search;
     }
-    console.log(sort.value);
+    if (query.state) {
+        stateValue.value = query.state;
+    }
 }
 
 const getCategories = async (data = null) => {
@@ -234,6 +321,19 @@ const getCategories = async (data = null) => {
     }
 }
 
+const getAllCategories = async () => {
+    try {
+        let result = await axiosInstance.get(`api/categories`, {
+            headers: {
+                'Authorization': `Bearer ${getToken.value}`,
+            }
+        });
+        allCategories.value = result.data
+    } catch (error) {
+        console.error("Произошла ошибка при выполнении запроса:", error);
+    }
+}
+
 const getProducts = async (data = null) => {
     try {
         let query = '';
@@ -244,6 +344,9 @@ const getProducts = async (data = null) => {
             }
             if (data.search) {
                 query += `search=${data.search}&`
+            }
+            if (data.state) {
+                query += `state=${data.state}&`
             }
             if (data.options) {
                 query += `options=${data.options}&`
@@ -268,7 +371,7 @@ const getProducts = async (data = null) => {
         });
         products.value = result.data;
 
-        console.log(products.value);
+        console.log(result.data);
     } catch (error) {
         console.error("Произошла ошибка при выполнении запроса:", error);
     }
@@ -277,10 +380,12 @@ const getProducts = async (data = null) => {
 onMounted(() => {
     getQuery(route.query)
 
+    getAllCategories()
     getProducts(
         {
             'categoryId': route.query.categoryId,
             'search': route.query.search,
+            'state': route.query.state,
             'options': route.query.options,
             'priceMin': route.query.priceMin,
             'priceMax': route.query.priceMax,

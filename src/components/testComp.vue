@@ -1,6 +1,6 @@
 <template>
     <div class="w-100 bg-body mt-4">
-        <div class="container">
+        <!-- <div class="container">
             <div class="row g-3">
 
                 <div v-for="category in categories" class="col-2">
@@ -48,7 +48,16 @@
                     </div>
                 </div>
             </div>
+        </div> -->
+        <div class="card flex justify-content-center">
+            <!-- <TreeSelect v-model="selectedNode" :options="treeData" :loading="loading" :filter="true"></TreeSelect> -->
+            <!-- <TreeSelect v-model="selectedValue" :options="nodes" :loading="false" :filter="true" option-label="label" option-value="value"></TreeSelect> -->
+            <!-- <TreeSelect v-model="selectedValue" :options="nodes" placeholder="Select Item" class="md:w-20rem w-full" /> -->
+            <!-- <pre>{{ selectedValue }}</pre> -->
+            <treeselect v-model="value" :multiple="false" :options="options" />
+            <pre>{{ value }}</pre>
         </div>
+
     </div>
 </template>
 <script setup>
@@ -59,6 +68,39 @@ import { useAuthStore } from '@/stores/authStore.js';
 import axiosInstance from '@/services/axios.js';
 import { productValidMixin } from '@/services/mixins/productValidMixin.js';
 
+// import TreeSelect from 'primevue/treeselect';
+// const nodes = ref([
+//     { label: 'Node 1', value: 'node1', children: [{ label: 'Node 1.1', value: 'node1.1' }] },
+//     { label: 'Node 2', value: 'node2', children: [{ label: 'Node 2.1', value: 'node2.1' }] },
+// ]);
+// const selectedValue = ref(null);
+import Treeselect from 'vue3-treeselect'
+import 'vue3-treeselect/dist/vue3-treeselect.css'
+const value = ref(null);
+const options = ref([{
+    id: 1,
+    label: 'a',
+    children: [{
+        id: 'aa',
+        label: 'aa',
+    }, {
+        id: 'ab',
+        label: 'ab',
+        children: [{
+            id: 'aa1',
+            label: 'aa1',
+        }, {
+            id: 'ab2',
+            label: 'ab2',
+        }],
+    }],
+}, {
+    id: 'b',
+    label: 'b',
+}, {
+    id: 'c',
+    label: 'c',
+}]);
 
 const categories = ref('');
 
@@ -75,7 +117,6 @@ const getAllCategories = async () => {
 }
 
 onMounted(() => {
-
     getAllCategories();
 });
 </script>

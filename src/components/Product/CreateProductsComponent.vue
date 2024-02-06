@@ -41,20 +41,28 @@
         </div>
 
         <div v-if="category !== null" class="container bg-body p-4 mb-2">
-            <div class="form-text">Цена*</div>
+            <div class="form-text ">Цена*</div>
             <div class="input-group">
                 <span class="input-group-text">грн</span>
                 <input v-model="price" type="text" class="form-control" aria-label="Amount (to the nearest dollar)">
             </div>
             <span class="text-danger">{{ messagePrice }}</span>
+
+            <div class="form-text mt-3">Состояние*</div>
+            <div class="input-group">
+                <select v-model="state" class="form-control">
+                    <option value="">-</option>
+                    <option value="second-hand">Б/у</option>
+                    <option value="new">Новый</option>
+                </select>
+            </div>
         </div>
 
         <div v-if="category !== null && category.parameters.length" class="container bg-body p-4 mb-2">
             <h5 for="exampleInputPassword1" class="form-label">Дополнительная информация</h5>
             <div v-for="parameter in category.parameters" class="mb-3">
                 <div class="form-text">{{ parameter.name }}</div>
-                <select v-if="parameter.type == 'select'" v-model="selectValue[parameter.id]"
-                    class="form-control">
+                <select v-if="parameter.type == 'select'" v-model="selectValue[parameter.id]" class="form-control">
                     <option v-for="option in parameter.options" :value="option.id">{{ option.name }}</option>
                 </select>
                 <div v-if="parameter.type == 'multiselect'" class="card flex justify-content-center">
@@ -82,13 +90,15 @@
             </div>
             <div class="mb-1">
                 <div class="form-text">Номер телефона</div>
-                <InputMask id="phone" class="form-control" v-model="phone" mask="999-999-9999" placeholder="999-999-9999" />
+                <InputMask id="phone" class="form-control" v-model="getUser.phone" mask="(999) 999-9999"
+                    placeholder="(999) 999-9999" disabled />
             </div>
+
         </div>
 
         <div class="container bg-body pt-4 pb-2">
             <button type="submit" class="btn btn-primary"
-                @click="checkBeforeCreation(name, category, description, price, multiselectValue, selectValue)">отправить</button>
+                @click="checkBeforeCreation(name, category, description, price, state, multiselectValue, selectValue)">отправить</button>
             <p class="text-danger">{{ messageCheck }}</p>
         </div>
     </div>
@@ -163,6 +173,7 @@ const category = ref(null);
 const name = ref('');
 const description = ref('');
 const price = ref('');
+const state = ref('');
 const phone = ref('');
 
 const messageName = ref(null);
@@ -260,11 +271,11 @@ const searchCategories = (categories) => {
     });
 }
 
-const checkBeforeCreation = (name, category, description, price, multiselect, select) => {
+const checkBeforeCreation = (name, category, description, price, state, multiselect, select) => {
     if (messageName.value != null || messageDescription.value != null || messagePrice.value != null || messagePhone.value != null) {
         return messageCheck.value = 'Проверьте все поля на правильность введения';
     }
-    if (name == '' || description == '' || category == null) {
+    if (name == '' || description == '' || category == null || state == '') {
         return messageCheck.value = 'Заполние важные поля';
     }
     if (price == '') {
@@ -298,6 +309,7 @@ const checkBeforeCreation = (name, category, description, price, multiselect, se
         'user_id': getUser.id,
         'description': description,
         'price': price,
+        'state': state,
         'status': 'wait',
         'category_id': category.id,
         'options': options,
