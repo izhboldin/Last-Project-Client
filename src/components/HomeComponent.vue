@@ -24,6 +24,34 @@
                 </div>
             </div>
         </div>
+        
+        <div v-if="products" class="container">
+                <h2>Недавно созданные Объявления</h2>
+                <!-- <pre>{{ products }}</pre> -->
+                <div class="row g-2">
+
+                    <div v-for="product in products.data" class="col-3 my-3">
+                        <div @click="router.push({ name: 'product', params: { id: product.id } })"
+                            class="cursor-pointer p-3 bg-body">
+                            <img src="https://i.redd.it/ux74bsifrpda1.jpg" class="card-img" alt="..."
+                                style="max-height: 30vh; object-fit: cover">
+                                <small class="py-2 blockquote-footer">{{ product.category.name }}</small>
+                            <h4 class="py-2 ">{{ product.title }}</h4>
+                            <h6><strong>{{ product.price }} грн.</strong></h6>
+
+                        </div>
+                    </div>
+                    <h4 class="text-center p-5" v-if="!products.data || !products.data.length">Объявления не найдены</h4>
+
+                    <div class="">
+                        <Paginator v-model:first="paginate" :rows="products.per_page" :totalRecords="products.total"></Paginator>
+                        <!-- {{ paginate }} -->
+                    </div>
+
+                </div>
+            </div>
+
+
     </div>
     <!-- <button type="button" class="form-control btn border" data-bs-toggle="modal" data-bs-target="#exampleModal">Выбрать
         категорию</button> -->
@@ -71,8 +99,11 @@ import axiosInstance from '@/services/axios.js';
 import { productValidMixin } from '@/services/mixins/productValidMixin.js';
 
 
+const { getUser, getToken } = storeToRefs(useAuthStore());
+
 const categories = ref('');
-const deviceName = navigator.userAgent;
+const products = ref(null);
+
 const router = useRouter();
 
 const getAllCategories = async () => {
@@ -88,8 +119,23 @@ const getAllCategories = async () => {
     }
 }
 
+const getProducts = async () => {
+    try {
+        let result = await axiosInstance.get(`api/products?date=desc`, {
+            headers: {
+                'Authorization': `Bearer ${getToken.value}`,
+            }
+        });
+        products.value = result.data;
+
+        console.log(result.data);
+    } catch (error) {
+        console.error("Произошла ошибка при выполнении запроса:", error);
+    }
+}
+
 onMounted(() => {
-console.log(deviceName);
+    getProducts();
     getAllCategories();
 });
 </script>

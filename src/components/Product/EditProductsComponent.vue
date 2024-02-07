@@ -9,23 +9,6 @@
                 <input v-model="name" type="text" class="form-control">
                 <span class="text-danger">{{ messageName }}</span>
             </div>
-            <div class="mb-1">
-                <label for="exampleInputPassword1" class="form-label">Укажите Категорию</label>
-                <div class="form-text">обязательно*</div>
-                <button v-if="category === null" type="button" class="form-control btn border" data-bs-toggle="modal"
-                    data-bs-target="#exampleModal">Выбрать категорию</button>
-
-                <div v-if="category !== null" class="card" style="width: 24rem;">
-                    <img src="..." class="card-img-top" alt="...">
-                    <div class="card-body p-2">
-                        <h5 class="card-title text-center">{{ category.name }}</h5>
-                        <button type="button" class="form-control btn border" data-bs-toggle="modal"
-                            data-bs-target="#exampleModal">Изменить</button>
-                    </div>
-                </div>
-                <!-- <pre>{{ category }}</pre> -->
-            </div>
-            <!-- <pre>{{ currentCategory }}</pre> -->
         </div>
 
         <div class="container bg-body p-4 mb-2">
@@ -81,66 +64,10 @@
             </div>
         </div>
 
-        <div class="container bg-body p-4 mb-2">
-            <div class="mb-3">
-                <label for="exampleInputPassword1" class="form-label">Контактная информация</label>
-                <div class="form-text">Email-адрес</div>
-                <input v-if="getUser" v-bind:value="getUser.email" type="text" class="form-control" disabled>
-                <input v-if="!getUser" type="text" class="form-control">
-            </div>
-            <div v-if="getUser" class="mb-1">
-                <div class="form-text">Номер телефона</div>
-                <InputMask id="phone" class="form-control" v-model="getUser.phone" mask="(999) 999-9999"
-                    placeholder="(999) 999-9999" disabled />
-            </div>
-
-        </div>
-
         <div class="container bg-body pt-4 pb-2">
             <button type="submit" class="btn btn-primary"
                 @click="checkBeforeCreation(name, category, description, price, state, multiselectValue, selectValue)">отправить</button>
             <p class="text-danger">{{ messageCheck }}</p>
-        </div>
-    </div>
-
-
-
-    <!-- Modal -->
-    <div class="modal fade modal-lg" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <button class="btn btn-outline-primary btn-sm mb-2 w-100" v-if="parentId !== null"
-                        @click="getBack()">back</button>
-
-                    <div v-if="currentCategory !== null" class="row g-2">
-
-                        <div v-for="category in currentCategory" class="col-4">
-                            <div class="p-2 card">
-                                <img src="https://i.ucrazy.ru/files/pics/2023.10/2023-10-17-21-53-072.webp" class="card-img"
-                                    alt="..." style="max-height: 20vh; object-fit: cover">
-                                <div class="card-body p-1">
-                                    <h4 class="card-title text-center">{{ category.name }}</h4>
-                                </div>
-                                <div class="card-body d-flex justify-content-between p-1">
-                                    <button :disabled="category.children.length === 0"
-                                        class="btn btn-outline-primary btn-sm"
-                                        @click="receive(category.children, category.parent_category_id)">Далее</button>
-
-                                    <button v-if="category.parent_category_id !== null && category.children.length === 0"
-                                        class="btn btn-outline-success btn-sm" @click="getDataCategory(category.id)"
-                                        aria-label="Close" data-bs-dismiss="modal">Выбрать</button>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </template>
@@ -154,9 +81,10 @@ import axiosInstance from '@/services/axios.js';
 import { productValidMixin } from '@/services/mixins/productValidMixin.js';
 
 
+const product = ref(null);
+const optionsArr = ref(null);
 
 import MultiSelect from 'primevue/multiselect';
-import InputMask from 'primevue/inputmask';
 const multiselectValue = ref({});
 const selectValue = ref({});
 
@@ -166,15 +94,14 @@ const router = useRouter()
 
 const parentId = ref(null);
 const currentParentId = ref(null);
-const categories = ref(null);
 const currentCategory = ref(null);
 const category = ref(null);
+const phone = ref(null);
 
 const name = ref('');
 const description = ref('');
 const price = ref('');
 const state = ref('');
-const phone = ref('');
 
 const messageName = ref(null);
 const messageDescription = ref(null);
@@ -193,9 +120,45 @@ watch(category, newValue => {
         if (element.type === 'select') {
             selectValue.value[`${element.id}`] = '';
         }
-        console.log(element.id, element.type);
     });
 })
+
+watch(product, newValue => {
+    // console.log(newValue.category.id);
+    getDataCategory(newValue.category.id)
+    getOptionsArr(newValue.options)
+    setOptionsFromQuery(route.query.options);
+})
+
+const setOptionsFromQuery = (queryOption) => {
+    if (category.value == null) {
+        return;
+    }
+    if (queryOption && category.value.parameters) {
+        let optionsArr = queryOption;
+        if (!(Array.isArray(optionsArr))) {
+            optionsArr = [parseInt(queryOption)]
+        }
+        optionsArr = optionsArr.map(str => parseInt(str));
+
+        category.value.parameters.forEach(parameter => {
+            parameter.options.forEach(option => {
+                if (optionsArr.includes(option.id)) {
+                    if (parameter.type == 'select') {
+                        selectValue.value[`${parameter.id}`] = option.id;
+                    }
+                    if (parameter.type == 'multiselect') {
+                        multiselectValue.value[`${parameter.id}`].push({
+                            "id": option.id,
+                            "name": option.name
+                        });
+                    }
+                }
+            })
+
+        })
+    }
+}
 
 watch(name, newValue => {
     return messageName.value = productValidMixin.validName(newValue);
@@ -210,20 +173,6 @@ watch(phone, newValue => {
     return messagePhone.value = productValidMixin.validPhone(newValue);
 })
 
-
-const getAllCategories = async () => {
-    try {
-        let result = await axiosInstance.get(`api/categories`);
-        if (result.data.length === 0) {
-            return
-        }
-        categories.value = result.data;
-        currentCategory.value = result.data;
-    } catch (error) {
-        console.error("Произошла ошибка при выполнении запроса:", error);
-    }
-}
-
 const getDataCategory = async (data) => {
     try {
         let result = await axiosInstance.get(`api/categories/${data}`);
@@ -231,31 +180,12 @@ const getDataCategory = async (data) => {
             return
         }
         category.value = result.data.data;
-        console.log(result.data);
         console.log(category.value);
     } catch (error) {
         console.error("Произошла ошибка при выполнении запроса:", error);
     }
 }
 
-const receive = (category, parId) => {
-    currentCategory.value = category;
-    parId == null ? parentId.value = 0 : parentId.value = parId;
-};
-
-
-const getBack = () => {
-    if (parentId.value == 0) {
-        parentId.value = null;
-        return currentCategory.value = categories.value;
-    }
-    categories.value.forEach(category => {
-        if (category.children) {
-            currentParentId.value = category.parent_category_id
-            searchCategories(category.children);
-        }
-    });
-}
 
 const searchCategories = (categories) => {
     categories.forEach(category => {
@@ -269,6 +199,10 @@ const searchCategories = (categories) => {
             searchCategories(category.children);
         }
     });
+}
+
+const getOptionsArr = (options) => {
+    optionsArr.value = options.map(obj => obj.id);
 }
 
 const checkBeforeCreation = (name, category, description, price, state, multiselect, select) => {
@@ -332,8 +266,24 @@ const createProduct = async (data) => {
         console.error("Произошла ошибка при выполнении запроса:", error);
     }
 }
+
+const getProduct = async (data) => {
+    try {
+        let result = await axiosInstance.get(`api/products/${data}`, {
+            headers: {
+                'Authorization': `Bearer ${getToken.value}`,
+            }
+        });
+        product.value = result.data.data;
+
+        console.log(product.value);
+    } catch (error) {
+        console.error("Произошла ошибка при выполнении запроса:", error);
+    }
+}
+
 onMounted(() => {
-    getAllCategories();
+    getProduct(route.params.id);
 });
 </script>
 <style></style>

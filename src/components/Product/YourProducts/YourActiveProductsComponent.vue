@@ -45,8 +45,6 @@
             </div>
         </div>
 
-
-
     </div>
 </template>
 <script setup>
@@ -63,7 +61,7 @@ const products = ref(null);
 
 const getProduct = async () => {
     try {
-        let result = await axiosInstance.get(`api/products?str=active`, {
+        let result = await axiosInstance.get(`api/products/getYourProduct?str=active`, {
             headers: {
                 'Authorization': `Bearer ${getToken.value}`,
             }

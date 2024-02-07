@@ -63,7 +63,7 @@ const products = ref(null);
 
 const getProduct = async () => {
     try {
-        let result = await axiosInstance.get(`api/products?str=notActive`, {
+        let result = await axiosInstance.get(`api/products/getYourProduct?str=notActive`, {
             headers: {
                 'Authorization': `Bearer ${getToken.value}`,
             }

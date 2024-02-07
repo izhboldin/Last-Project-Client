@@ -19,15 +19,16 @@
                         </div>
                     </div>
                     <div class="p-3 bg-body">
+                        <small class="py-2 blockquote-footer">{{ product.category.name }}</small>
                         <div class="mb-4">
                             <h4><strong>Описание</strong></h4>
                             <p>{{ product.description }}</p>
 
                         </div>
-                        <div>
+                        <div v-if="product.options.length">
                             <h4><strong>Параметры</strong></h4>
                             <p class="card-text my-1 d-flex flex-wrap">
-                            <div class="d-flex align-items-center bg-light p-2 me-2" v-for="option in product.options">
+                            <div class="d-flex align-items-center bg-light p-2 me-2 mb-2" v-for="option in product.options">
                                 <span class="material-symbols-outlined">chevron_right</span>
                                 <small class="text-muted">{{ option.parameter.name }}: {{ option.name }}. </small>
                             </div>

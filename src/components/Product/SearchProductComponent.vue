@@ -3,7 +3,8 @@
         <div class="container pb-4">
             <div class="input-group">
                 <input type="text" class="form-control  p-3" placeholder="Recipient's username" v-model="searchValue">
-                <button class="btn btn-info" type="button" id="button-addon2 " @click="search()">Поиск</button>
+                <button class="btn btn-danger" type="button" @click="deleteSearch()">X</button>
+                <button class="btn btn-info" type="button" @click="search()">Поиск</button>
             </div>
         </div>
         <div v-if="categories" class="w-100">
@@ -58,7 +59,7 @@
                 </div>
             </div>
             <div class="border-bottom mb-3"></div>
-            <div class="container">
+            <div v-if="products" class="container">
                 <div class="col-3">
                     <div class="p-2  input-group">
                         <span class="input-group-text bg-info">Сортировка</span>
@@ -74,17 +75,23 @@
                 <!-- <pre>{{ products }}</pre> -->
                 <div class="row g-2">
 
-                    <div v-for="product in products" class="col-3 ">
+                    <div v-for="product in products.data" class="col-3 my-3">
                         <div @click="router.push({ name: 'product', params: { id: product.id } })"
                             class="cursor-pointer p-3 bg-body">
                             <img src="https://i.redd.it/ux74bsifrpda1.jpg" class="card-img" alt="..."
                                 style="max-height: 30vh; object-fit: cover">
-                            <h5 class="py-2">{{ product.title }}</h5>
-                            <h6>{{ product.price }} грн.</h6>
+                                <small class="py-2 blockquote-footer">{{ product.category.name }}</small>
+                            <h4 class="py-2 ">{{ product.title }}</h4>
+                            <h6><strong>{{ product.price }} грн.</strong></h6>
 
                         </div>
                     </div>
-                    <h4 class="text-center p-5" v-if="!products || !products.length">Объявления не найдены</h4>
+                    <h4 class="text-center p-5" v-if="!products.data || !products.data.length">Объявления не найдены</h4>
+
+                    <div class="">
+                        <Paginator v-model:first="paginate" :rows="products.per_page" :totalRecords="products.total"></Paginator>
+                        {{ paginate }}
+                    </div>
 
                 </div>
             </div>
@@ -98,12 +105,15 @@ import { RouterView, useRoute, useRouter } from 'vue-router'
 import axiosInstance from '@/services/axios.js';
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/stores/authStore.js';
-import { format } from 'date-fns';
+
 import MultiSelect from 'primevue/multiselect';
+import Paginator from 'primevue/paginator';
 
 import Treeselect from 'vue3-treeselect'
 import 'vue3-treeselect/dist/vue3-treeselect.css'
 const categoriesTree = ref(null);
+const paginate = ref(2);
+const paginatePage = ref(1);
 
 const { getToken } = storeToRefs(useAuthStore());
 
@@ -140,11 +150,17 @@ watch(categories, newValue => {
     });
 
     setOptionsFromQuery(route.query.options);
-
-
 })
 
+watch(paginate, newValue => {
+    search()
+})
+
+
 const setOptionsFromQuery = (queryOption) => {
+    if (categories.value == null) {
+        return;
+    }
     if (queryOption && categories.value.parameters) {
         let optionsArr = queryOption;
         if (!(Array.isArray(optionsArr))) {
@@ -176,10 +192,10 @@ watch(allCategories, newValue => {
     categoriesTree.value = transformCategoriesTree(newValue);
 })
 
-watch(valueCategoryId, newValue => {
-    getCategories(newValue)
-    search()
-})
+// watch(valueCategoryId, newValue => {
+// getCategories(newValue)
+
+// })
 
 const transformCategoriesTree = (categories) => {
 
@@ -213,10 +229,12 @@ const transformCategoriesTree = (categories) => {
     }
 }
 
+
 const search = () => {
     let query = {};
     if (valueCategoryId.value) {
         query.categoryId = valueCategoryId.value;
+        getCategories(valueCategoryId.value)
     }
     if (priceMin.value) {
         query.minPrice = priceMin.value;
@@ -239,7 +257,15 @@ const search = () => {
             query.price = sortArr[1];
         }
     }
-
+    
+    if(paginate.value) {
+        if(paginate.value < products.value.per_page){
+            query.page = 1
+        }
+        else{
+            query.page = (paginate.value / products.value.per_page) + 1;;
+        }
+    }
 
     query.options = [];
     for (const key in multiselectValue.value) {
@@ -256,18 +282,20 @@ const search = () => {
             query.options.push(selectValue.value[key]);
         }
     }
-    
-    if (query.options.length == 0) {
-        query.options = route.query.options;
-        console.log(query.options);
-    }
 
     getProducts(query)
+    // getCategories(newValue)
+
 
     router.push({
         name: 'search',
         query: query,
     })
+}
+
+const deleteSearch = () => {
+    searchValue.value = ''
+    search();
 }
 
 const getQuery = (query) => {
@@ -276,8 +304,9 @@ const getQuery = (query) => {
     if (query.categoryId) {
         valueCategoryId.value = query.categoryId;
     }
-    if (query.option) {
-        setOptionsFromQuery(query.option);
+    if (query.options) {
+        // console.log(query.options);
+        setOptionsFromQuery(query.options);
     }
 
     query.categoryId ? getCategories(query.categoryId) : getCategories()
@@ -301,6 +330,9 @@ const getQuery = (query) => {
     if (query.state) {
         stateValue.value = query.state;
     }
+    // if (query.page) {
+    //     paginatePage.value = query.page;
+    // }
 }
 
 const getCategories = async (data = null) => {
@@ -363,6 +395,9 @@ const getProducts = async (data = null) => {
             if (data.price) {
                 query += `price=${data.price}&`
             }
+            if (data.page) {
+                query += `page=${data.page}&`
+            }
         }
         let result = await axiosInstance.get(`api/products${query}`, {
             headers: {
@@ -380,7 +415,6 @@ const getProducts = async (data = null) => {
 onMounted(() => {
     getQuery(route.query)
 
-    getAllCategories()
     getProducts(
         {
             'categoryId': route.query.categoryId,
@@ -391,7 +425,10 @@ onMounted(() => {
             'priceMax': route.query.priceMax,
             'date': route.query.date,
             'price': route.query.price,
+            'page': route.query.page,
         })
+
+    getAllCategories()
 })
 
 </script>
