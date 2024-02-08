@@ -80,7 +80,7 @@
                             class="cursor-pointer p-3 bg-body">
                             <img src="https://i.redd.it/ux74bsifrpda1.jpg" class="card-img" alt="..."
                                 style="max-height: 30vh; object-fit: cover">
-                                <small class="py-2 blockquote-footer">{{ product.category.name }}</small>
+                            <small class="py-2 blockquote-footer">{{ product.category.name }}</small>
                             <h4 class="py-2 ">{{ product.title }}</h4>
                             <h6><strong>{{ product.price }} грн.</strong></h6>
 
@@ -89,7 +89,8 @@
                     <h4 class="text-center p-5" v-if="!products.data || !products.data.length">Объявления не найдены</h4>
 
                     <div class="">
-                        <Paginator v-model:first="paginate" :rows="products.per_page" :totalRecords="products.total"></Paginator>
+                        <Paginator v-model:first="paginate" :rows="products.per_page" :totalRecords="products.total">
+                        </Paginator>
                         {{ paginate }}
                     </div>
 
@@ -122,6 +123,8 @@ const router = useRouter();
 
 const categories = ref(null);
 const valueCategoryId = ref(null);
+const oldValueCategoryId = ref(null);
+const isEqualValueCategoryId = ref(true);
 const allCategories = ref(null);
 const products = ref(null);
 const searchInput = ref(null);
@@ -140,6 +143,7 @@ watch(categories, newValue => {
     if (Array.isArray(newValue) || !newValue) {
         return
     }
+    // заполнение объектов опций ключами
     newValue.parameters.forEach(element => {
         if (element.type === 'multiselect') {
             multiselectValue.value[`${element.id}`] = [];
@@ -156,7 +160,7 @@ watch(paginate, newValue => {
     search()
 })
 
-
+//заполение объектов опций значениеми из квери-параметров
 const setOptionsFromQuery = (queryOption) => {
     if (categories.value == null) {
         return;
@@ -188,14 +192,34 @@ const setOptionsFromQuery = (queryOption) => {
 }
 
 watch(allCategories, newValue => {
-    console.log(newValue);
     categoriesTree.value = transformCategoriesTree(newValue);
 })
 
-// watch(valueCategoryId, newValue => {
-// getCategories(newValue)
+watch(valueCategoryId, newValue => {
 
-// })
+    if (oldValueCategoryId.value === null) {
+        oldValueCategoryId.value = newValue;
+        return
+    }
+
+    oldValueCategoryId.value !== newValue ? isEqualValueCategoryId.value = false : isEqualValueCategoryId.value = true;
+
+    // if (oldValueCategoryId.value !== newValue) {
+    //     let currentParams = route.query
+    //     currentParams.categoryId = newValue
+    //     delete currentParams.options;
+    //     router.push({
+    //         name: 'search',
+    //         query: currentParams    ,
+    //     })
+
+    //     // router.replace({ query: currentParams });
+    //     getProducts(currentParams)
+    //     getCategories(newValue)
+    // }
+
+    oldValueCategoryId.value = newValue;
+})
 
 const transformCategoriesTree = (categories) => {
 
@@ -233,6 +257,10 @@ const transformCategoriesTree = (categories) => {
 const search = () => {
     let query = {};
     if (valueCategoryId.value) {
+        if (valueCategoryId.value != route.query.categoryId) {
+            multiselectValue.value = {};
+            selectValue.value = {};
+        }
         query.categoryId = valueCategoryId.value;
         getCategories(valueCategoryId.value)
     }
@@ -257,17 +285,35 @@ const search = () => {
             query.price = sortArr[1];
         }
     }
-    
-    if(paginate.value) {
-        if(paginate.value < products.value.per_page){
+
+    if (paginate.value && products.value) {
+        if (paginate.value < products.value.per_page) {
             query.page = 1
         }
-        else{
+        else {
             query.page = (paginate.value / products.value.per_page) + 1;;
         }
     }
 
+    query.options = getOptionsArr();
+    console.log(isEqualValueCategoryId.value);
+    // if (isEqualValueCategoryId.value === true) {
+
+    // }
+
+    getProducts(query)
+    // getCategories(newValue)
+
+    router.push({
+        name: 'search',
+        query: query,
+    })
+}
+
+const getOptionsArr = () => {
+    let query = {};
     query.options = [];
+
     for (const key in multiselectValue.value) {
         if (multiselectValue.value[key].length === 0) {
         } else {
@@ -283,14 +329,7 @@ const search = () => {
         }
     }
 
-    getProducts(query)
-    // getCategories(newValue)
-
-
-    router.push({
-        name: 'search',
-        query: query,
-    })
+    return query.options;
 }
 
 const deleteSearch = () => {

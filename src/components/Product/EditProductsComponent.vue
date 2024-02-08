@@ -1,6 +1,6 @@
 <template>
     <div class="bg-light w100 p-3">
-        <h2 class="text-center pb-2">Cоздание Объявления</h2>
+        <h2 class="text-center pb-2">Редактирование Объявления</h2>
 
         <div class="container bg-body p-4 mb-2">
             <div class="mb-3">
@@ -65,8 +65,9 @@
         </div>
 
         <div class="container bg-body pt-4 pb-2">
-            <button type="submit" class="btn btn-primary"
-                @click="checkBeforeCreation(name, category, description, price, state, multiselectValue, selectValue)">отправить</button>
+            <button type="submit" class="btn btn-primary me-2"
+                @click="checkBeforeCreation(name, category, description, price, state, multiselectValue, selectValue)">Изменить</button>
+            <button type="button" class="btn btn-secondary" @click="router.go(-1)">назад</button>
             <p class="text-danger">{{ messageCheck }}</p>
         </div>
     </div>
@@ -114,20 +115,23 @@ watch(category, newValue => {
     selectValue.value = {};
     newValue.parameters.forEach(element => {
         if (element.type === 'multiselect') {
-            // console.log(123);
             multiselectValue.value[`${element.id}`] = [];
         }
         if (element.type === 'select') {
             selectValue.value[`${element.id}`] = '';
         }
     });
+    setOptionsFromQuery(optionsArr.value);
 })
 
 watch(product, newValue => {
-    // console.log(newValue.category.id);
-    getDataCategory(newValue.category.id)
     getOptionsArr(newValue.options)
-    setOptionsFromQuery(route.query.options);
+    getCategory(newValue.category.id)
+
+    name.value = newValue.title
+    description.value = newValue.description
+    price.value = newValue.price
+    state.value = newValue.state
 })
 
 const setOptionsFromQuery = (queryOption) => {
@@ -173,14 +177,13 @@ watch(phone, newValue => {
     return messagePhone.value = productValidMixin.validPhone(newValue);
 })
 
-const getDataCategory = async (data) => {
+const getCategory = async (data) => {
     try {
         let result = await axiosInstance.get(`api/categories/${data}`);
         if (result.data.length === 0) {
             return
         }
         category.value = result.data.data;
-        console.log(category.value);
     } catch (error) {
         console.error("Произошла ошибка при выполнении запроса:", error);
     }
@@ -217,7 +220,6 @@ const checkBeforeCreation = (name, category, description, price, state, multisel
     }
 
     let options = [];
-    console.log(multiselect);
     for (const key in multiselect) {
         if (multiselect[key].length === 0) {
             return messageCheck.value = 'Заполните всю дополнительну информацию';
@@ -236,31 +238,26 @@ const checkBeforeCreation = (name, category, description, price, state, multisel
     }
     messageCheck.value = ''
 
-    console.log('класс');
 
     const data = {
         'title': name,
-        'user_id': getUser.id,
         'description': description,
         'price': price,
         'state': state,
         'status': 'wait',
-        'category_id': category.id,
         'options': options,
     }
-    console.log(data);
-    createProduct(data);
+    updateProduct(data);
 
 }
 
-const createProduct = async (data) => {
+const updateProduct = async (data) => {
     try {
-        let result = await axiosInstance.post('api/products', data, {
+        let result = await axiosInstance.put(`api/products/${route.params.id}`, data, {
             headers: {
                 'Authorization': `Bearer ${getToken.value}`,
             }
         });
-        console.log(result.data);
         router.push({ name: 'yourWaitProducts' })
     } catch (error) {
         console.error("Произошла ошибка при выполнении запроса:", error);
@@ -276,7 +273,6 @@ const getProduct = async (data) => {
         });
         product.value = result.data.data;
 
-        console.log(product.value);
     } catch (error) {
         console.error("Произошла ошибка при выполнении запроса:", error);
     }

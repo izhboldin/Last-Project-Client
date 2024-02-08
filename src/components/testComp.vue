@@ -1,63 +1,27 @@
 <template>
-    <div class="w-100 bg-body mt-4">
-        <!-- <div class="container">
-            <div class="row g-3">
-
-                <div v-for="category in categories" class="col-2">
-                    <div class="p-3 text-center  bg-body">
-                        <img src="https://ireland.apollo.olxcdn.com:443/v1/files/zo9y2rkxi8941-UA/image;s=1000x700"
-                            class="img-fluid object-fit-cover rounded-circle" style="height: 120px; width: 120px;"
-                            alt="...">
-                        <h5 class="mt-2"><strong>{{ category.name }}</strong></h5>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <!-- Сообщение собеседника -->
+                <div class="media mb-3">
+                    <img src="https://via.placeholder.com/40" class="mr-3 rounded-circle" alt="User Avatar">
+                    <div class="media-body">
+                        <p class="bg-light p-3 rounded">Сообщение собеседника здесь</p>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-    <button  type="button" class="form-control btn border" data-bs-toggle="modal"
-                    data-bs-target="#exampleModal">Выбрать категорию</button>
 
-    <div class="modal fade modal-lg" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <button class="btn btn-outline-primary btn-sm mb-2 w-100" v-if="parentId !== null || !isNaN(parentId)"
-                        @click="getBack()">back</button>
-
-                    <div v-if="currentCategory !== null" class="row g-2">
-
-                        <div v-for="category in currentCategory" class="col-4 p-2 card">
-                            <img src="https://i.ucrazy.ru/files/pics/2023.10/2023-10-17-21-53-072.webp" class="card-img"
-                                alt="..." style="max-height: 20vh; object-fit: cover">
-                            <div class="card-body p-1">
-                                <h4 class="card-title text-center">{{ category.name }}</h4>
-                            </div>
-                            <div class="card-body d-flex justify-content-between p-1">
-                                <button v-if="category.children.length !== 0" class="btn btn-outline-primary btn-sm"
-                                    @click="receive(category.children, category.parent_category_id)">Далее</button>
-                                <button v-if="category.parent_category_id !== null && category.children.length === 0" class="btn btn-outline-success btn-sm"
-                                    @click="getDataCategory(category.id)" aria-label="Close"
-                                    data-bs-dismiss="modal">Выбрать</button>
-                            </div>
-                        </div>
-
+                <!-- Ваше сообщение -->
+                <div class="media mb-3 justify-content-end">
+                    <div class="media-body">
+                        <p class="bg-primary text-white p-3 rounded">Ваше сообщение здесь</p>
                     </div>
+                    <img src="https://via.placeholder.com/40" class="ml-3 rounded-circle" alt="Your Avatar">
                 </div>
-            </div>
-        </div> -->
-        <div class="card flex justify-content-center">
-            <!-- <TreeSelect v-model="selectedNode" :options="treeData" :loading="loading" :filter="true"></TreeSelect> -->
-            <!-- <TreeSelect v-model="selectedValue" :options="nodes" :loading="false" :filter="true" option-label="label" option-value="value"></TreeSelect> -->
-            <!-- <TreeSelect v-model="selectedValue" :options="nodes" placeholder="Select Item" class="md:w-20rem w-full" /> -->
-            <!-- <pre>{{ selectedValue }}</pre> -->
-            <treeselect v-model="value" :multiple="false" :options="options" />
-            <pre>{{ value }}</pre>
-        </div>
 
+                <!-- Добавьте новые сообщения, следуя тому же формату -->
+
+            </div>
+        </div>
     </div>
 </template>
 <script setup>

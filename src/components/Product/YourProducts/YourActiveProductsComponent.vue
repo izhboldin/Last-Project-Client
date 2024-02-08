@@ -18,7 +18,8 @@
                             <h6 class="card-title">Цена: {{ product.price }}</h6>
                         </div>
                         <p class="card-text my-1"></p>
-                        <p class="card-text my-1"><small class="text-muted">Категория: {{ product.category.name }}</small></p>
+                        <p class="card-text my-1"><small class="text-muted">Категория: {{ product.category.name }}</small>
+                        </p>
                         <p class="card-text my-1 d-flex">
                         <div class="d-flex align-items-center" v-for="option in product.options">
                             <span class="material-symbols-outlined">chevron_right</span>
@@ -32,23 +33,42 @@
 
                 <div class="row d-flex justify-content-between py-2">
 
-                    <div class="col-3">
-                        qwe
-                    </div>
-                    <div class="col-3">
-                        dasdas
-                    </div>
-                    <button class="btn border col-3 btn-outline-info"
+                    <button type="button" class="btn btn-outline-danger col-3" data-bs-toggle="modal"
+                        @click="createDeleteId(product.id)" data-bs-target="#exampleModal">Удалить</button>
+                    <button type="button" class="btn col-3 btn-outline-warning"
+                        @click="router.push({ name: 'editProducts', params: { id: product.id } })">Изменить</button>
+                    <button type="button" class="btn col-3 btn-outline-info"
                         @click="router.push({ name: 'product', params: { id: product.id } })">Подробнее</button>
                 </div>
 
             </div>
         </div>
 
+
+
+        <!-- Модальное окно -->
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Удаление объявления</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Вы уверены что хотите удалить это объявление?</p>
+                        <button class="btn btn-outline-danger" @click="deleteProduct(deleteProductId)"
+                            data-bs-dismiss="modal" aria-label="Закрыть">Удалить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
     </div>
 </template>
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import axiosInstance from '@/services/axios.js';
 import { storeToRefs } from 'pinia'
@@ -58,10 +78,18 @@ const { getUser, getToken } = storeToRefs(useAuthStore());
 const router = useRouter();
 
 const products = ref(null);
+const deleteProductId = ref(null);
 
+const createDeleteId = (id) => {
+    deleteProductId.value = id;
+}
+
+watch(getUser, () => {
+    getProduct();
+})
 const getProduct = async () => {
     try {
-        let result = await axiosInstance.get(`api/products/getYourProduct?str=active`, {
+        let result = await axiosInstance.get(`api/products?str=active&userId=${getUser.value.id}`, {
             headers: {
                 'Authorization': `Bearer ${getToken.value}`,
             }
@@ -74,9 +102,24 @@ const getProduct = async () => {
     }
 }
 
+const deleteProduct = async (data) => {
+    try {
+        console.log(data);
+        let result = await axiosInstance.delete(`api/products/${data}`, {
+            headers: {
+                'Authorization': `Bearer ${getToken.value}`,
+            }
+        });
+        getProduct();
+
+    } catch (error) {
+        console.error("Произошла ошибка при выполнении запроса:", error);
+    }
+}
 onMounted(() => {
-    getProduct();
+    if (getUser.value) {
+        getProduct();
+    }
 })
 </script>
-<style>
-</style>
+<style></style>

@@ -56,11 +56,6 @@ const router = createRouter({
           component: () => import('@/components/Product/YourProducts/YourWaitProductsComponent.vue'),
         },
         {
-          path: '/your-products/not-active',
-          name: 'yourNotActiveProducts',
-          component: () => import('@/components/Product/YourProducts/YourNotActiveProductsComponent.vue'),
-        },
-        {
           path: '/your-products/reject',
           name: 'yourRejectProducts',
           component: () => import('@/components/Product/YourProducts/YourRejectProductsComponent.vue'),
@@ -73,9 +68,14 @@ const router = createRouter({
       component: () => import('@/components/Product/CreateProductsComponent.vue'),
     },
     {
-      path: '/create-edit/:id',
-      name: 'createEdit',
+      path: '/edit-products/:id',
+      name: 'editProducts',
       component: () => import('@/components/Product/EditProductsComponent.vue'),
+    },
+    {
+      path: '/chats',
+      name: 'chats',
+      component: () => import('@/components/Chat/ChatComponent.vue'),
     },
   ]
 })

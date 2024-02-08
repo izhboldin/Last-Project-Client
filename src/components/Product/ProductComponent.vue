@@ -43,9 +43,15 @@
                             Date(product.created_at), "yyyy-MM-dd") }}</small></p>
                         <h5>{{ product.title }}</h5>
                         <h4><strong>{{ product.price }} грн.</strong></h4>
-                        <button class="btn btn-outline-info w-100 mb-2" type="button">Написать</button>
-                        <button class="btn btn-outline-info w-100 mb-2" type="button" @click="showPhone()">{{messagePhoneValue}}</button>
-                        <button class="btn btn-info w-100" type="button">Купить</button>
+                        <template v-if="getUser">
+                            <button v-if="product.user.id !== getUser.id" class="btn btn-outline-info w-100 mb-2" type="button"
+                                @click="getOrCreateChat()">Написать</button>
+                        </template>
+                        <button class="btn btn-outline-info w-100 mb-2" type="button"
+                        @click="showPhone()">{{ messagePhoneValue }}</button>
+                        <template v-if="getUser">
+                                <button v-if="product.user.id !== getUser.id" class="btn btn-info w-100" type="button">Купить</button>
+                        </template>
                     </div>
                     <div class="p-3 bg-body mb-3">
                         <h5><strong>Способи доставки</strong></h5>
@@ -68,12 +74,11 @@
                     </div>
                 </div>
 
-            </div>
-            <div v-if="!product" class="py-5 text-center">
-                товар отсутствует
+                <div v-if="!product" class="py-5 text-center">
+                    товар отсутствует
+                </div>
             </div>
         </div>
-
     </div>
 </template>
 <script setup>
@@ -90,11 +95,25 @@ const router = useRouter();
 
 const product = ref(null);
 const search = ref(null);
-const messagePhoneValue = ref('Показать телефон') 
+const messagePhoneValue = ref('Показать телефон')
 // const id = ref(route.params.id);
 
 const showPhone = () => {
     messagePhoneValue.value = getUser.value.phone;
+}
+
+const getOrCreateChat = async () => {
+    try {
+        let result = await axiosInstance.get(`api/chats/get-or-create?sellerId=${product.value.user.id}`, {
+            headers: {
+                'Authorization': `Bearer ${getToken.value}`,
+            }
+        })
+        console.log(result.data.data);
+
+    } catch (error) {
+        console.error("Произошла ошибка при выполнении запроса:", error);
+    }
 }
 
 const getProduct = async (data) => {
@@ -107,6 +126,7 @@ const getProduct = async (data) => {
         product.value = result.data.data;
 
         console.log(product.value);
+        console.log(product.value.user.id);
     } catch (error) {
         console.error("Произошла ошибка при выполнении запроса:", error);
     }

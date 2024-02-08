@@ -97,8 +97,9 @@
         </div>
 
         <div class="container bg-body pt-4 pb-2">
-            <button type="submit" class="btn btn-primary"
+            <button type="submit" class="btn btn-primary me-2"
                 @click="checkBeforeCreation(name, category, description, price, state, multiselectValue, selectValue)">отправить</button>
+            <button type="button" class="btn btn-secondary" @click="router.go(-1)">назад</button>
             <p class="text-danger">{{ messageCheck }}</p>
         </div>
     </div>

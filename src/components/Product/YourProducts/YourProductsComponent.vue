@@ -9,9 +9,6 @@
                 <router-link v-bind:class="{ 'fw-bolder border-dark': route.name === 'yourWaitProducts' }"
                     class="py-3 border-bottom fs-4 text-decoration-none text-dark w-50 text-center"
                     to="/your-products/wait">Ожидающие</router-link>
-                <router-link v-bind:class="{ 'fw-bolder border-dark': route.name === 'yourNotActiveProducts' }"
-                    class="py-3 border-bottom fs-4 text-decoration-none text-dark w-50 text-center"
-                    to="/your-products/not-active">Неактивные</router-link>
                 <router-link v-bind:class="{ 'fw-bolder border-dark': route.name === 'yourRejectProducts' }"
                     class="py-3 border-bottom fs-4 text-decoration-none text-dark w-50 text-center"
                     to="/your-products/reject">Отклоненные</router-link>
