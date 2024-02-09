@@ -109,7 +109,8 @@ const getOrCreateChat = async () => {
                 'Authorization': `Bearer ${getToken.value}`,
             }
         })
-        console.log(result.data.data);
+        console.log(result.data.data.id);
+        router.push({name: "chats", query: {status: 'buyer', chatId: result.data.data.id}})
 
     } catch (error) {
         console.error("Произошла ошибка при выполнении запроса:", error);

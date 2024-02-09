@@ -7,97 +7,102 @@
                 <button class="btn btn-info" type="button" @click="search()">Поиск</button>
             </div>
         </div>
-        <div v-if="categories" class="w-100">
-            <div class="container">
-                <h4><strong>Фильтры</strong></h4>
-                <!-- <pre>{{ categories }}</pre> -->
-                <!-- <div class="row row-cols-2 row-cols-lg-5 g-3 g-lg-3"> -->
-                <div class="row g-3">
+        <template v-if="categories">
+            <div class="w-100">
+                <div class="container">
+                    <h4><strong>Фильтры</strong></h4>
+                    <!-- <pre>{{ categories }}</pre> -->
+                    <!-- <div class="row row-cols-2 row-cols-lg-5 g-3 g-lg-3"> -->
+                    <div class="row g-3">
 
-                    <div class="col-5">
-                        <div class="p-2 ">
-                            <label for="exampleInputEmail1" class="form-label mb-0">Категория</label>
-                            <treeselect v-model="valueCategoryId" :multiple="false" :options="categoriesTree" />
-                            <!-- <button v-if="!(route.query.categoryId)" class="form-control">Все категории</button> -->
-                            <!-- <button v-if="(route.query.categoryId)" class="form-control">{{ categories.name }}</button> -->
-                        </div>
-                    </div>
-
-                    <div class="col-4">
-                        <label for="exampleInputEmail1" class="form-label mb-0">Цена</label>
-                        <div class="p-2  input-group">
-                            <input type="number" class="form-control" placeholder="От:" v-model="priceMin">
-                            <input type="number" class="form-control" placeholder="До:" v-model="priceMax">
-                        </div>
-                    </div>
-                    <div class="col-3">
-                        <label for="exampleInputEmail1" class="form-label mb-0">Состояние</label>
-                        <div class="p-2  input-group">
-                            <select class="form-control" v-model="stateValue">
-                                <option value="">-</option>
-                                <option value="second-hand">Б/у</option>
-                                <option value="new">Новый</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div v-for="parameter in categories.parameters" class="col-3">
-                        <label for="exampleInputEmail1" class="form-label mb-0">{{ parameter.name }}</label>
-                        <div class="p-2  input-group">
-                            <select v-if="parameter.type == 'select'" class="form-control"
-                                v-model="selectValue[parameter.id]">
-                                <option value="">-</option>
-                                <option v-for="option in parameter.options" :value="option.id">{{ option.name }}</option>
-                            </select>
-                            <div v-if="parameter.type == 'multiselect'" class="w-100">
-                                <MultiSelect v-model="multiselectValue[parameter.id]" :options="parameter.options"
-                                    optionLabel="name" placeholder="" :maxSelectedLabels="30" class="w-full w-100" />
+                        <div class="col-5">
+                            <div class="p-2 ">
+                                <label for="exampleInputEmail1" class="form-label mb-0">Категория</label>
+                                <treeselect v-model="valueCategoryId" :multiple="false" :options="categoriesTree" />
+                                <!-- <button v-if="!(route.query.categoryId)" class="form-control">Все категории</button> -->
+                                <!-- <button v-if="(route.query.categoryId)" class="form-control">{{ categories.name }}</button> -->
                             </div>
                         </div>
-                    </div>
-                    <!-- <pre>multiselectValue: {{ multiselectValue }}</pre>
+
+                        <div class="col-4">
+                            <label for="exampleInputEmail1" class="form-label mb-0">Цена</label>
+                            <div class="p-2  input-group">
+                                <input type="number" class="form-control" placeholder="От:" v-model="priceMin">
+                                <input type="number" class="form-control" placeholder="До:" v-model="priceMax">
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <label for="exampleInputEmail1" class="form-label mb-0">Состояние</label>
+                            <div class="p-2  input-group">
+                                <select class="form-control" v-model="stateValue">
+                                    <option value="">-</option>
+                                    <option value="second-hand">Б/у</option>
+                                    <option value="new">Новый</option>
+                                </select>
+                            </div>
+                        </div>  
+                        <div v-for="parameter in categories.parameters" class="col-3">
+                            <label for="exampleInputEmail1" class="form-label mb-0">{{ parameter.name }}</label>
+                            <div class="p-2  input-group">
+                                <select v-if="parameter.type == 'select'" class="form-control"
+                                    v-model="selectValue[parameter.id]">
+                                    <option value="">-</option>
+                                    <option v-for="option in parameter.options" :value="option.id">{{ option.name }}
+                                    </option>
+                                </select>
+                                <div v-if="parameter.type == 'multiselect'" class="w-100">
+                                    <MultiSelect v-model="multiselectValue[parameter.id]" :options="parameter.options"
+                                        optionLabel="name" placeholder="" :maxSelectedLabels="30" class="w-full w-100" />
+                                </div>
+                            </div>
+                        </div>
+                        <!-- <pre>multiselectValue: {{ multiselectValue }}</pre>
                     <pre>selectValue: {{ selectValue }}</pre> -->
-                </div>
-            </div>
-            <div class="border-bottom mb-3"></div>
-            <div v-if="products" class="container">
-                <div class="col-3">
-                    <div class="p-2  input-group">
-                        <span class="input-group-text bg-info">Сортировка</span>
-                        <select class="form-control" v-model="sort">
-                            <option value="">-</option>
-                            <option value="price=asc">Цена по возрастанию</option>
-                            <option value="price=desc">Цена по убыванию</option>
-                            <option value="date=desc">Самые новые</option>
-                            <option value="date=asc">Самые старые</option>
-                        </select>
                     </div>
                 </div>
-                <!-- <pre>{{ products }}</pre> -->
-                <div class="row g-2">
-
-                    <div v-for="product in products.data" class="col-3 my-3">
-                        <div @click="router.push({ name: 'product', params: { id: product.id } })"
-                            class="cursor-pointer p-3 bg-body">
-                            <img src="https://i.redd.it/ux74bsifrpda1.jpg" class="card-img" alt="..."
-                                style="max-height: 30vh; object-fit: cover">
-                            <small class="py-2 blockquote-footer">{{ product.category.name }}</small>
-                            <h4 class="py-2 ">{{ product.title }}</h4>
-                            <h6><strong>{{ product.price }} грн.</strong></h6>
-
+                <div class="border-bottom mb-3"></div>
+                <div v-if="products" class="container">
+                    <div class="col-3">
+                        <div class="p-2  input-group">
+                            <span class="input-group-text bg-info">Сортировка</span>
+                            <select class="form-control" v-model="sort">
+                                <option value="">-</option>
+                                <option value="price=asc">Цена по возрастанию</option>
+                                <option value="price=desc">Цена по убыванию</option>
+                                <option value="date=desc">Самые новые</option>
+                                <option value="date=asc">Самые старые</option>
+                            </select>
                         </div>
                     </div>
-                    <h4 class="text-center p-5" v-if="!products.data || !products.data.length">Объявления не найдены</h4>
+                    <!-- <pre>{{ products }}</pre> -->
+                    <div class="row g-2">
 
-                    <div class="">
-                        <Paginator v-model:first="paginate" :rows="products.per_page" :totalRecords="products.total">
-                        </Paginator>
-                        {{ paginate }}
+                        <div v-for="product in products.data" class="col-3 my-3">
+                            <div @click="router.push({ name: 'product', params: { id: product.id } })"
+                                class="cursor-pointer p-3 bg-body">
+                                <img src="https://i.redd.it/ux74bsifrpda1.jpg" class="card-img" alt="..."
+                                    style="max-height: 30vh; object-fit: cover">
+                                <small class="py-2 blockquote-footer">{{ product.category.name }}</small>
+                                <h4 class="py-2 ">{{ product.title }}</h4>
+                                <h6><strong>{{ product.price }} грн.</strong></h6>
+
+                            </div>
+                        </div>
+                        <h4 class="text-center p-5" v-if="!products.data || !products.data.length">Объявления не найдены
+                        </h4>
+
+                        <div class="">
+                            <Paginator v-model:first="paginate" :rows="products.per_page" :totalRecords="products.total">
+                            </Paginator>
+                            {{ paginate }}
+                        </div>
+
                     </div>
-
                 </div>
             </div>
-        </div>
-        <h3 class="text-center p-5" v-if="!categories">404</h3>
+        </template>
+
+        <h3 class="text-center p-5" v-if="!categories">Загрузка</h3>
     </div>
 </template>
 <script setup>
@@ -385,8 +390,8 @@ const getCategories = async (data = null) => {
                 'Authorization': `Bearer ${getToken.value}`,
             }
         });
+        console.log(result.data);
         data ? categories.value = result.data.data : categories.value = result.data
-        console.log(categories.value);
     } catch (error) {
         console.error("Произошла ошибка при выполнении запроса:", error);
     }

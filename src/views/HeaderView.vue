@@ -8,6 +8,10 @@
             <ul class="navbar-nav ms-auto">
               <li class="nav-item">
                 <router-link class="nav-link"
+                :to="{ name: 'chats', query: {status: 'byers'} }">Сообщения</router-link>
+              </li>
+              <li class="nav-item">
+                <router-link class="nav-link"
                 :to="{ name: 'createProducts' }">Создание объявления</router-link>
               </li>
               <li class="nav-item">
