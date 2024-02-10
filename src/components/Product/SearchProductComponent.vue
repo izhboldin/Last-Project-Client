@@ -94,7 +94,6 @@
                         <div class="">
                             <Paginator v-model:first="paginate" :rows="products.per_page" :totalRecords="products.total">
                             </Paginator>
-                            {{ paginate }}
                         </div>
 
                     </div>

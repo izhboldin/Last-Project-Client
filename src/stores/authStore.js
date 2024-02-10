@@ -54,7 +54,7 @@ export const useAuthStore = defineStore('alerts', () => {
                         'Authorization': `Bearer ${token.value}`,
                     },
                 });
-            user.value = result.data;
+            user.value = result.data.data;
             // console.log(result.data);
             // console.log(user.value);
             // const router = useRouter();

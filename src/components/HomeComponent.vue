@@ -51,7 +51,6 @@
                 </div>
             </div>
 
-
     </div>
     <!-- <button type="button" class="form-control btn border" data-bs-toggle="modal" data-bs-target="#exampleModal">Выбрать
         категорию</button> -->

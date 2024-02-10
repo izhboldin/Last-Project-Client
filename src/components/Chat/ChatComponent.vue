@@ -3,7 +3,7 @@
         <div class="container">
             <div class="row g-3">
 
-                <div class="col-4">
+                <div class="col-3">
                     <div class="p-3 bg-body mb-3" style="min-height: 80vh">
                         <div class="mb-2">
                             <button v-bind:class="{ 'btn-info': route.query.status == 'buyer' }" class="btn  me-3"
@@ -13,24 +13,9 @@
                         </div>
                         <div>
 
-                            <!-- <div class="w-100 bg-light p-2 mb-2">
-                                <div class="d-flex m-2">
-                                    <img src="https://lh3.googleusercontent.com/ogw/ANLem4afL67FThoAbnFlPCV9H4ZDAwh-v8UILFH30VLztg=s32-c-mo"
-                                        style="height: 42px; width: 42px;" alt=""
-                                        class="img-fluid object-fit-cover rounded-circle me-3">
-                                    <h6 class="my-1">саня</h6>
-                                </div>
-                            </div>
+                            <div v-if="!chats" class="text-center mt-5">Загрузка</div>
+                            <div v-if="chats && chats.length == 0" class="text-center mt-5">У вас нет чатов</div>
 
-                            <div class="w-100 bg-info p-2 mb-2">
-                                <div class="d-flex m-2">
-                                    <img src="https://lh3.googleusercontent.com/ogw/ANLem4afL67FThoAbnFlPCV9H4ZDAwh-v8UILFH30VLztg=s32-c-mo"
-                                        style="height: 42px; width: 42px;" alt=""
-                                        class="img-fluid object-fit-cover rounded-circle me-3">
-                                    <h6 class="my-1">саня</h6>
-                                </div>
-                            </div>
-                            qwe -->
                             <template v-for="chat in chats">
                                 <div @click="getMessages(chat.id)"
                                     v-bind:class="{ 'bg-info': route.query.chatId == chat.id, 'bg-light': route.query.chatId != chat.id }"
@@ -41,6 +26,11 @@
                                             class="img-fluid object-fit-cover rounded-circle me-3">
                                         <h6 v-if="route.query.status == 'buyer'" class="my-1">{{ chat.seller.name }}</h6>
                                         <h6 v-if="route.query.status == 'seller'" class="my-1">{{ chat.buyer.name }}</h6>
+                                        <div class="w-100 d-flex justify-content-end align-items-start">
+                                            <IconEnvelope @click="SendСomplaintChatId(chat.id)" data-bs-toggle="modal"
+                                                data-bs-target="#exampleModal" class="cursor-pointer"
+                                                style="width: 20px; height: 20px;"></IconEnvelope>
+                                        </div>
                                     </div>
                                 </div>
                             </template>
@@ -48,7 +38,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-8">
+                <div class="col-9">
                     <div class="p-3 bg-body mb-3" style="min-height: 80vh">
                         <!-- <div class="d-flex m-2 mb-3">
                             <img src="https://lh3.googleusercontent.com/ogw/ANLem4afL67FThoAbnFlPCV9H4ZDAwh-v8UILFH30VLztg=s32-c-mo"
@@ -61,36 +51,51 @@
 
 
 
-                        <div class="w-100 bg-light p-3 flex-column-reverse mb-3 overflow-auto" style="min-height: calc(70vh - 56px); max-height: calc(70vh - 55px)">
-                            <div v-for="message in messages" class="row h-100 justify-content-between">
+                        <div class="w-100 bg-light p-3 flex-column-reverse mb-3 overflow-auto"
+                            style="min-height: calc(70vh - 56px); max-height: calc(70vh - 55px)">
+                            <div v-if="!messages && !route.query.chatId" class="m-auto">Виберите чат</div>
+                            <div v-if="!messages && route.query.chatId && !WindowMessageValue" class="m-auto">Загрузка</div>
+                            <div v-if="!messages && route.query.chatId && WindowMessageValue" class="m-auto">Чата не существует</div>
 
-                                <div v-if="message.user.id != getUser.id" class="row justify-content-start">
+                            <template v-if="messages">
+                                <div v-if="messages.length == 0 && route.query.chatId" class="m-auto">Этот чат пуст</div>
+                                <div v-for="message in messages" class="row h-100 justify-content-between">
 
-                                    <div class="d-flex mb-2">
-                                        <div class="col-md-7 bg-secondary p-2 rounded">
-                                            <h6 class="m-0">{{ message.message }}</h6>
-                                            <p class="my-0 d-flex justify-content-end fw-light ">{{ format(new Date(message.created_at),"dd.MM HH:mm") }}</p>
+                                    <div v-if="message.user.id != getUser.id" class="row justify-content-start">
+
+                                        <div class="d-flex mb-2">
+                                            <div class="col-md-7 bg-secondary p-2 rounded">
+                                                <h6 class="m-0">{{ message.message }}</h6>
+                                                <p class="my-0 d-flex justify-content-end fw-light ">{{ format(new
+                                                    Date(message.created_at), "dd.MM HH:mm") }}</p>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div v-if="message.user.id == getUser.id" class="row justify-content-end">
+                                    <div v-if="message.user.id == getUser.id" class="row justify-content-end">
 
-                                    <div class="d-flex justify-content-end mb-2">
-                                        <div class="col-md-7 bg-primary p-2 rounded">
-                                            <h6 class="m-0">{{ message.message }}</h6>
-                                            <p class="my-0 d-flex justify-content-end fw-light ">{{ format(new Date(message.created_at),"dd.MM HH:mm") }}</p>
+                                        <div class="d-flex justify-content-end mb-2">
+                                            <div class="col-md-7 bg-primary p-2 rounded">
+                                                <h6 class="m-0">{{ message.message }}</h6>
+                                                <p class="my-0 d-flex justify-content-end fw-light ">{{ format(new
+                                                    Date(message.created_at), "dd.MM HH:mm") }}</p>
+                                                <!-- <p class="my-0 d-flex justify-content-end fw-light ">
+                                                    <IconTrash @click="" class="cursor-pointer" style="width: 20px; height: 20px;"></IconTrash>
+                                                    {{ format(new Date(message.created_at), "dd.MM HH:mm") }}</p> -->
+                                            </div>
+
                                         </div>
                                     </div>
-                                </div>
 
-                            </div>
+                                </div>
+                            </template>
                         </div>
 
                         <div class="w-100 ">
                             <div class="row">
                                 <div class="col-8">
-                                    <input type="text" class="w-100 form-control" v-model="messageValue">
+                                    <input type="text" class="w-100 form-control" v-model="messageValue"
+                                        @keyup.enter="sendMessage(messageValue)">
                                 </div>
                                 <div class="col-4">
                                     <button class="w-100 btn btn-info" @click="sendMessage(messageValue)">отправить</button>
@@ -98,6 +103,37 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Жалоба на пользователя</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="mb-1">Виберите причину жалобы:</label>
+                    <select v-model="reasonСomplaint" class="form-control mb-2">
+                        <option value="">-</option>
+                        <option value="w">Нецензурное поведение</option>
+                        <option value="w">Спам и нежелательные сообщения</option>
+                        <option value="w">Оскорбительное поведение</option>
+                        <option value="w">Попытки обмана</option>
+                        <option value="w">Другое нарушение</option>
+                    </select>
+                    <label class="mb-1">Подробно опишите причину жалобы:</label>
+                    <textarea v-model="descriptionСomplaint" type="text" class="form-control"></textarea>
+                    {{СomplaintChatId}}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-primary">Отправить жалобу</button>
                 </div>
             </div>
         </div>
@@ -110,6 +146,9 @@ import axiosInstance from '@/services/axios.js';
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/stores/authStore.js';
 import { format } from 'date-fns';
+import IconTrash from '@/components/icons/IconTrash.vue';
+import IconEnvelope from '@/components/icons/IconEnvelope.vue';
+
 
 const { getToken, getUser } = storeToRefs(useAuthStore());
 
@@ -119,6 +158,16 @@ const router = useRouter()
 const chats = ref(null);
 const messages = ref(null);
 const messageValue = ref(null);
+const WindowMessageValue = ref(null);
+const messageValueBroadcast = ref(null);
+
+const СomplaintChatId = ref(null);
+const reasonСomplaint = ref("");
+const descriptionСomplaint = ref(null);
+
+const SendСomplaintChatId = (id) => {
+    СomplaintChatId.value = id;
+}
 
 const checkStatus = () => {
 
@@ -138,7 +187,6 @@ const checkChatId = () => {
     let queryData = { ...route.query };
 
     if (!queryData.chatId) {
-        console.log(123);
         return
     }
     getMessages(queryData.chatId)
@@ -172,7 +220,6 @@ const getChats = async (status) => {
             }
         });
         chats.value = result.data.data;
-        console.log(result.data.data);
     } catch (error) {
         console.error("Произошла ошибка при выполнении запроса:", error);
     }
@@ -185,7 +232,7 @@ const getChats = async (status) => {
 const getMessages = async (chatId) => {
     let queryData = { ...route.query };
 
-    if(!chatId){
+    if (!chatId) {
         return
     }
 
@@ -206,8 +253,9 @@ const getMessages = async (chatId) => {
         });
         messages.value = result.data.data;
         messages.value.reverse();;
-        console.log(result.data.data);
+        WindowMessageValue.value = null;
     } catch (error) {
+        WindowMessageValue.value = [];
         console.error("Произошла ошибка при выполнении запроса:", error);
     }
 
@@ -216,7 +264,7 @@ const getMessages = async (chatId) => {
 const sendMessage = async (message) => {
     let queryData = { ...route.query };
 
-    if(!message || message == '' || !queryData.chatId){
+    if (!message || message == '' || !queryData.chatId) {
         return
     }
     const data = {
@@ -229,9 +277,8 @@ const sendMessage = async (message) => {
                 'Authorization': `Bearer ${getToken.value}`,
             }
         });
-        console.log(result.data);
+        // messages.value.unshift(result.data.data)
         messageValue.value = null;
-        getMessages(queryData.chatId)
     } catch (error) {
         console.error("Произошла ошибка при выполнении запроса:", error);
     }
@@ -239,9 +286,21 @@ const sendMessage = async (message) => {
 }
 
 onMounted(() => {
-    checkStatus()
-    checkChatId()
-})
+    checkStatus();
+    checkChatId();
+    // Echo.channel(`messages.${1}`)
+    // .listen('MessageWasCreated', (e) => {
+    //     messageValueBroadcast.value = e;
+    //     messages.value.unshift( e.message)
+    // });
+    Echo.channel(`chat`)
+        .listen('MessageSent', (e) => {
+            messageValueBroadcast.value = e;
+            if (e.message.chat == route.query.chatId) {
+                messages.value.unshift(e.message)
+            }
+        });
+});
 
 </script>
 <style>

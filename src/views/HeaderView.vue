@@ -2,13 +2,13 @@
         <header>
       <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
-          <router-link class="navbar-brand" :to="{ name: 'home' }">buy-sale</router-link>
+          <router-link class="navbar-brand" :to="{ name: 'home' }">buy-sell</router-link>
           
           <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
               <li class="nav-item">
                 <router-link class="nav-link"
-                :to="{ name: 'chats', query: {status: 'byers'} }">Сообщения</router-link>
+                :to="{ name: 'chats', query: {status: 'buyer'} }">Сообщения</router-link>
               </li>
               <li class="nav-item">
                 <router-link class="nav-link"
