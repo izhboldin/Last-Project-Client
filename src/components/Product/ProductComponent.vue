@@ -1,4 +1,31 @@
 <template>
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Жалоба на объявление</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <label class="mb-1">Виберите причину жалобы:</label>
+                    <select v-model="reasonСomplaint" class="form-control mb-2">
+                        <option value="Неподходящий контент">Неподходящий контент</option>
+                        <option value="Нарушение правил">Нарушение правил</option>
+                        <option value="Неправильная категория">Неправильная категория</option>
+                        <option value="Другое">Другое</option>
+                    </select>
+                    <label class="mb-1">Подробно опишите причину жалобы:</label>
+                    <textarea v-model="descriptionСomplaint" type="text" class="form-control"></textarea>
+                    <span class="text-danger">{{ messageText }}</span>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-primary" @click="checkData()">Отправить жалобу</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="py-4">
         <div class="container pb-4">
             <div class="input-group">
@@ -44,13 +71,14 @@
                         <h5>{{ product.title }}</h5>
                         <h4><strong>{{ product.price }} грн.</strong></h4>
                         <template v-if="getUser">
-                            <button v-if="product.user.id !== getUser.id" class="btn btn-outline-info w-100 mb-2" type="button"
-                                @click="getOrCreateChat()">Написать</button>
+                            <button v-if="product.user.id !== getUser.id" class="btn btn-outline-info w-100 mb-2"
+                                type="button" @click="getOrCreateChat()">Написать</button>
                         </template>
-                        <button class="btn btn-outline-info w-100 mb-2" type="button"
-                        @click="showPhone()">{{ messagePhoneValue }}</button>
+                        <button class="btn btn-outline-info w-100 mb-2" type="button" @click="showPhone()">{{
+                            messagePhoneValue }}</button>
                         <template v-if="getUser">
-                                <button v-if="product.user.id !== getUser.id" class="btn btn-info w-100" type="button">Купить</button>
+                            <button v-if="product.user.id !== getUser.id" class="btn btn-info w-100"
+                                type="button">Купить</button>
                         </template>
                     </div>
                     <div class="p-3 bg-body mb-3">
@@ -62,10 +90,23 @@
                     <div class="p-3 bg-body">
                         <h5><strong>Пользователь</strong></h5>
                         <div class="d-flex m-2">
-                            <img src="https://lh3.googleusercontent.com/ogw/ANLem4afL67FThoAbnFlPCV9H4ZDAwh-v8UILFH30VLztg=s32-c-mo"
-                                style="height: 36px; width: 36px;" alt=""
+
+                            <img v-if="product.user.image" v-bind:src="product.user.image.full_url"
+                                style="height: 54px; width: 54px;" alt=""
                                 class="img-fluid object-fit-cover rounded-circle me-2">
-                            <h6 class="my-1">{{ product.user.name }}</h6>
+                            <img v-if="!product.user.image" src="http://localhost:8080/storage/images/no-user-image.webp"
+                                style="height: 54px; width: 54px;" alt=""
+                                class="img-fluid object-fit-cover rounded-circle me-2">
+
+                            <h6 class="my-3 w-100">{{ product.user.name }}</h6>
+                            <div class="w-100 d-flex justify-content-end">
+                                <template v-if="getUser">
+                                    <IconEnvelope v-if="product.user.id !== getUser.id" data-bs-toggle="modal"
+                                        data-bs-target="#exampleModal" class="cursor-pointer"
+                                        style="width: 20px; height: 20px;">
+                                    </IconEnvelope>
+                                </template>
+                            </div>
                         </div>
                         <p class=""><small class="text-muted">На сайте с {{ format(new Date(product.user.created_at),
                             "yyyy-MM-dd") }}</small></p>
@@ -73,7 +114,6 @@
 
                     </div>
                 </div>
-
                 <div v-if="!product" class="py-5 text-center">
                     товар отсутствует
                 </div>
@@ -82,21 +122,55 @@
     </div>
 </template>
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { RouterView, useRoute, useRouter } from 'vue-router'
 import axiosInstance from '@/services/axios.js';
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/stores/authStore.js';
 import { format } from 'date-fns';
 
+import IconEnvelope from '@/components/icons/IconEnvelope.vue';
+import { validationMixin } from '@/services/mixins/validationMixin.js';
+
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
+
 const { getUser, getToken } = storeToRefs(useAuthStore());
 const route = useRoute();
 const router = useRouter();
 
+const reasonСomplaint = ref("Неподходящий контент");
+const descriptionСomplaint = ref(null);
+
 const product = ref(null);
 const search = ref(null);
+
 const messagePhoneValue = ref('Показать телефон')
-// const id = ref(route.params.id);
+const messageText = ref(null)
+
+
+watch(descriptionСomplaint, newValue => {
+    return messageText.value = validationMixin.validText(newValue);
+})
+
+const checkData = () => {
+
+    if (messageText.value != null && descriptionСomplaint.value == '') {
+        return
+    }
+
+    let data = {
+        'text': descriptionСomplaint.value,
+        'reason': reasonСomplaint.value,
+        'complainant_user_id': getUser.value.id,
+        'reported_user_id': product.value.user.id,
+        'product_id': route.params.id,
+        'status': 'wait',
+        'type': 'product',
+    }
+    console.log(data);
+    createСomplaint(data);
+}
 
 const showPhone = () => {
     messagePhoneValue.value = getUser.value.phone;
@@ -110,11 +184,28 @@ const getOrCreateChat = async () => {
             }
         })
         console.log(result.data.data.id);
-        router.push({name: "chats", query: {status: 'buyer', chatId: result.data.data.id}})
+        router.push({ name: "chats", query: { status: 'buyer', chatId: result.data.data.id } })
 
     } catch (error) {
         console.error("Произошла ошибка при выполнении запроса:", error);
     }
+}
+
+const createСomplaint = async (data) => {
+    try {
+        let result = await axiosInstance.post(`api/complaints`, data, {
+            headers: {
+                'Authorization': `Bearer ${getToken.value}`,
+            }
+        });
+        toast.success("Жалоба успешно отправлена!", {
+            autoClose: 2000,
+        });
+        console.log(result.data);
+    } catch (error) {
+        console.error("Произошла ошибка при выполнении запроса:", error);
+    }
+
 }
 
 const getProduct = async (data) => {

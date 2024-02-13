@@ -55,11 +55,40 @@ export const useAuthStore = defineStore('alerts', () => {
                     },
                 });
             user.value = result.data.data;
-            // console.log(result.data);
-            // console.log(user.value);
-            // const router = useRouter();
+
+
         } catch (error) {
             console.error("Произошла ошибка при выполнении запроса:", error);
+        }
+    }
+
+    const isBan = (data) => {
+        let isBan = false;
+        user.value.ban.forEach(ban => {
+            if (ban.complaint_id.type == data && ban.is_permanent_ban == 1 || ban.complaint_id.type == data && ban.expiry_time > new Date().toISOString()) {
+                isBan = true;
+            }
+        });
+        return isBan
+    }
+
+    const logout = async () => {
+        try {
+            token.value = Cookies.get('token');
+            if (!token.value) {
+                return;
+            }
+            let result = await axiosInstance.post('/api/logout',
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token.value}`,
+                    },
+                });
+            user.value = null;
+            token.value = null;
+            Cookies.remove('token');
+        } catch (error) {
+            console.error("Произошла ошибка при выходе из аккаунта:", error);
         }
     }
 
@@ -68,6 +97,8 @@ export const useAuthStore = defineStore('alerts', () => {
         login,
         getUser,
         getToken,
-        getDataUser
+        getDataUser,
+        isBan,
+        logout
     }
 })

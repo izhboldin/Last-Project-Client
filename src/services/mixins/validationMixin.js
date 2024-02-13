@@ -59,6 +59,16 @@ export class validationMixin {
         }
         return null
     }
+    
+    static validText(text){
+        if (validationMixin.isEmpty(text)) {
+            return 'Заполните поле'
+        }
+        if (validationMixin.checkLength(text, 6, 300)) {
+            return 'Текст не может быть меньше 6, и больше 300 символов';
+        }
+        return null
+    }
 
 
 

@@ -74,6 +74,9 @@ import axiosInstance from '@/services/axios.js';
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/stores/authStore.js';
 
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
+
 const { getUser, getToken } = storeToRefs(useAuthStore());
 const router = useRouter();
 
@@ -111,6 +114,9 @@ const deleteProduct = async (data) => {
             }
         });
         getProduct();
+        toast.success("Объявление успешно удалено!", {
+        autoClose: 2000,
+    });
 
     } catch (error) {
         console.error("Произошла ошибка при выполнении запроса:", error);

@@ -23,26 +23,8 @@ window.Echo = new Echo({
 	key: "52d84e311b5b5b7c89c9",
 	cluster: "mt1",
 	forceTLS: true,
-	// auth: {
-    //     headers: {
-    //         Authorization: 'Bearer ' + '9|Bp2BXpCP3WchLvaTheLZ6vUhVsoZMvAqhzgBMMyG8903ade9'
-    //     },
-    // },
 	// encrypted: false
 });
-
-// const conectEcho = {
-// 	mounted() {
-
-// 		Echo.private(`chats.${orderId}`)
-// 			.listen('MessageWasCreated', (e) => {
-// 				console.log('qwe');
-// 				console.log(e);
-// 				// console.log(e.message);
-// 				// console.log(e.user);
-// 			});
-// 	},
-// }
 
 const pinia = createPinia()
 const app = createApp(App)

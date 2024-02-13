@@ -13,43 +13,51 @@
                 <h2 class="text-center p-2">Разделы на категории </h2>
                 <div class="row g-3">
                     <div v-for="category in categories" class="col-2">
+                        <!-- <pre>{{ category }}</pre> -->
                         <div class="p-3 text-center  bg-body cursor-pointer"
                             @click="router.push({ name: 'search', query: { 'categoryId': category.id } })">
-                            <img src="https://ireland.apollo.olxcdn.com:443/v1/files/zo9y2rkxi8941-UA/image;s=1000x700"
+
+                            <img v-if="category.image" v-bind:src="category.image.full_url"
                                 class="img-fluid object-fit-cover rounded-circle" style="height: 120px; width: 120px;"
                                 alt="...">
+
+                            <img v-if="!category.image" src="http://localhost:8080/storage/images/no_image_available.png"
+                                class="img-fluid object-fit-cover rounded-circle" style="height: 120px; width: 120px;"
+                                alt="...">
+
                             <h6 class="mt-2"><strong>{{ category.name }}</strong></h6>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
+
         <div v-if="products" class="container">
-                <h2>Недавно созданные Объявления</h2>
-                <!-- <pre>{{ products }}</pre> -->
-                <div class="row g-2">
+            <h2>Недавно созданные Объявления</h2>
+            <!-- <pre>{{ products }}</pre> -->
+            <div class="row g-2">
 
-                    <div v-for="product in products.data" class="col-3 my-3">
-                        <div @click="router.push({ name: 'product', params: { id: product.id } })"
-                            class="cursor-pointer p-3 bg-body">
-                            <img src="https://i.redd.it/ux74bsifrpda1.jpg" class="card-img" alt="..."
-                                style="max-height: 30vh; object-fit: cover">
-                                <small class="py-2 blockquote-footer">{{ product.category.name }}</small>
-                            <h4 class="py-2 ">{{ product.title }}</h4>
-                            <h6><strong>{{ product.price }} грн.</strong></h6>
+                <div v-for="product in products.data" class="col-3 my-3">
+                    <div @click="router.push({ name: 'product', params: { id: product.id } })"
+                        class="cursor-pointer p-3 bg-body">
+                        <img src="https://i.redd.it/ux74bsifrpda1.jpg" class="card-img" alt="..."
+                            style="max-height: 30vh; object-fit: cover">
+                        <small class="py-2 blockquote-footer">{{ product.category.name }}</small>
+                        <h4 class="py-2 ">{{ product.title }}</h4>
+                        <h6><strong>{{ product.price }} грн.</strong></h6>
 
-                        </div>
                     </div>
-                    <h4 class="text-center p-5" v-if="!products.data || !products.data.length">Объявления не найдены</h4>
-
-                    <div class="">
-                        <Paginator v-model:first="paginate" :rows="products.per_page" :totalRecords="products.total"></Paginator>
-                        <!-- {{ paginate }} -->
-                    </div>
-
                 </div>
+                <h4 class="text-center p-5" v-if="!products.data || !products.data.length">Объявления не найдены</h4>
+
+                <div class="">
+                    <Paginator v-model:first="paginate" :rows="products.per_page" :totalRecords="products.total">
+                    </Paginator>
+                    <!-- {{ paginate }} -->
+                </div>
+
             </div>
+        </div>
 
     </div>
     <!-- <button type="button" class="form-control btn border" data-bs-toggle="modal" data-bs-target="#exampleModal">Выбрать

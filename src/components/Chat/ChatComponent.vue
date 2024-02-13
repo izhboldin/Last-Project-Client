@@ -21,13 +21,31 @@
                                     v-bind:class="{ 'bg-info': route.query.chatId == chat.id, 'bg-light': route.query.chatId != chat.id }"
                                     class="cursor-pointer w-100 p-2 mb-2">
                                     <div class="d-flex m-2">
-                                        <img src="https://lh3.googleusercontent.com/ogw/ANLem4afL67FThoAbnFlPCV9H4ZDAwh-v8UILFH30VLztg=s32-c-mo"
-                                            style="height: 42px; width: 42px;" alt=""
-                                            class="img-fluid object-fit-cover rounded-circle me-3">
+
+                                        <template v-if="route.query.status == 'buyer'">
+                                            <img v-if="chat.seller.image" v-bind:src="chat.seller.image.full_url"
+                                                style="height: 42px; width: 42px;" alt=""
+                                                class="img-fluid object-fit-cover rounded-circle me-3">
+                                            <img v-if="!chat.seller.image"
+                                                src="http://localhost:8080/storage/images/no-user-image.webp"
+                                                style="height: 42px; width: 42px;" alt=""
+                                                class="img-fluid object-fit-cover rounded-circle me-3">
+                                        </template>
+                                        <template v-if="route.query.status == 'seller'">
+                                            <img v-if="chat.buyer.image" v-bind:src="chat.buyer.image.full_url"
+                                                style="height: 42px; width: 42px;" alt=""
+                                                class="img-fluid object-fit-cover rounded-circle me-3">
+                                            <img v-if="!chat.buyer.image"
+                                                src="http://localhost:8080/storage/images/no-user-image.webp"
+                                                style="height: 42px; width: 42px;" alt=""
+                                                class="img-fluid object-fit-cover rounded-circle me-3">
+                                        </template>
+
                                         <h6 v-if="route.query.status == 'buyer'" class="my-1">{{ chat.seller.name }}</h6>
                                         <h6 v-if="route.query.status == 'seller'" class="my-1">{{ chat.buyer.name }}</h6>
+
                                         <div class="w-100 d-flex justify-content-end align-items-start">
-                                            <IconEnvelope @click="SendСomplaintChatId(chat.id)" data-bs-toggle="modal"
+                                            <IconEnvelope @click="SendСomplaintUserId(chat)" data-bs-toggle="modal"
                                                 data-bs-target="#exampleModal" class="cursor-pointer"
                                                 style="width: 20px; height: 20px;"></IconEnvelope>
                                         </div>
@@ -55,7 +73,8 @@
                             style="min-height: calc(70vh - 56px); max-height: calc(70vh - 55px)">
                             <div v-if="!messages && !route.query.chatId" class="m-auto">Виберите чат</div>
                             <div v-if="!messages && route.query.chatId && !WindowMessageValue" class="m-auto">Загрузка</div>
-                            <div v-if="!messages && route.query.chatId && WindowMessageValue" class="m-auto">Чата не существует</div>
+                            <div v-if="!messages && route.query.chatId && WindowMessageValue" class="m-auto">Чата не
+                                существует</div>
 
                             <template v-if="messages">
                                 <div v-if="messages.length == 0 && route.query.chatId" class="m-auto">Этот чат пуст</div>
@@ -79,9 +98,7 @@
                                                 <h6 class="m-0">{{ message.message }}</h6>
                                                 <p class="my-0 d-flex justify-content-end fw-light ">{{ format(new
                                                     Date(message.created_at), "dd.MM HH:mm") }}</p>
-                                                <!-- <p class="my-0 d-flex justify-content-end fw-light ">
-                                                    <IconTrash @click="" class="cursor-pointer" style="width: 20px; height: 20px;"></IconTrash>
-                                                    {{ format(new Date(message.created_at), "dd.MM HH:mm") }}</p> -->
+
                                             </div>
 
                                         </div>
@@ -91,17 +108,55 @@
                             </template>
                         </div>
 
-                        <div class="w-100 ">
-                            <div class="row">
-                                <div class="col-8">
-                                    <input type="text" class="w-100 form-control" v-model="messageValue"
-                                        @keyup.enter="sendMessage(messageValue)">
+                        <template v-if="getUser">
+                            <template v-if="isBan('chat')">
+                                <div class="container">
+                                    <div class="w-100 ">
+                                        <div class="row">
+
+                                            <template v-for="ban in getUser.ban">
+                                                <template v-if="ban.complaint_id.type == 'chat'">
+                                                    <template v-if="ban.is_permanent_ban == 1">
+
+                                                        <div class="col-8">
+                                                            <input type="text" class="w-100 form-control"
+                                                                value="У вас заблокирован доступ к чатам навсегда" disabled>
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <button class="w-100 btn btn-info" disabled>отправить</button>
+                                                        </div>
+                                                    </template>
+                                                    <template v-if="ban.expiry_time">
+                                                        <div class="col-8">
+                                                            <input type="text" class="w-100 form-control"
+                                                                v-bind:value="'У вас заблокирован доступ к чатам на ' + ban.expiry_time"
+                                                                disabled>
+                                                        </div>
+                                                        <div class="col-4">
+                                                            <button class="w-100 btn btn-info" disabled>отправить</button>
+                                                        </div>
+                                                    </template>
+                                                </template>
+                                            </template>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="col-4">
-                                    <button class="w-100 btn btn-info" @click="sendMessage(messageValue)">отправить</button>
+                            </template>
+                            <template v-if="!isBan('chat')">
+                                <div class="w-100 ">
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <input type="text" class="w-100 form-control" v-model="messageValue"
+                                                @keyup.enter="sendMessage(messageValue)">
+                                        </div>
+                                        <div class="col-4">
+                                            <button class="w-100 btn btn-info"
+                                                @click="sendMessage(messageValue)">отправить</button>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
+                            </template>
+                        </template>
                     </div>
                 </div>
             </div>
@@ -109,7 +164,6 @@
     </div>
 
 
-    <!-- Modal -->
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -120,20 +174,19 @@
                 <div class="modal-body">
                     <label class="mb-1">Виберите причину жалобы:</label>
                     <select v-model="reasonСomplaint" class="form-control mb-2">
-                        <option value="">-</option>
-                        <option value="w">Нецензурное поведение</option>
-                        <option value="w">Спам и нежелательные сообщения</option>
-                        <option value="w">Оскорбительное поведение</option>
-                        <option value="w">Попытки обмана</option>
-                        <option value="w">Другое нарушение</option>
+                        <option value="Нецензурное поведение">Нецензурное поведение</option>
+                        <option value="Спам и нежелательные сообщения">Спам и нежелательные сообщения</option>
+                        <option value="Оскорбительное поведение">Оскорбительное поведение</option>
+                        <option value="Попытки обмана">Попытки обмана</option>
+                        <option value="Другое нарушение">Другое нарушение</option>
                     </select>
                     <label class="mb-1">Подробно опишите причину жалобы:</label>
                     <textarea v-model="descriptionСomplaint" type="text" class="form-control"></textarea>
-                    {{СomplaintChatId}}
+                    <span class="text-danger">{{ messageText }}</span>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                    <button type="button" class="btn btn-primary">Отправить жалобу</button>
+                    <button type="button" class="btn btn-primary" @click="checkData()">Отправить жалобу</button>
                 </div>
             </div>
         </div>
@@ -149,8 +202,13 @@ import { format } from 'date-fns';
 import IconTrash from '@/components/icons/IconTrash.vue';
 import IconEnvelope from '@/components/icons/IconEnvelope.vue';
 
+import { validationMixin } from '@/services/mixins/validationMixin.js';
+
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
 
 const { getToken, getUser } = storeToRefs(useAuthStore());
+const { isBan } = useAuthStore();
 
 const route = useRoute()
 const router = useRouter()
@@ -161,12 +219,45 @@ const messageValue = ref(null);
 const WindowMessageValue = ref(null);
 const messageValueBroadcast = ref(null);
 
-const СomplaintChatId = ref(null);
-const reasonСomplaint = ref("");
-const descriptionСomplaint = ref(null);
+const СomplaintChat = ref(null);
+const reasonСomplaint = ref("Нецензурное поведение");
+const descriptionСomplaint = ref('');
 
-const SendСomplaintChatId = (id) => {
-    СomplaintChatId.value = id;
+const messageText = ref(null);
+
+const SendСomplaintUserId = (chat) => {
+    СomplaintChat.value = chat;
+}
+
+watch(descriptionСomplaint, newValue => {
+    return messageText.value = validationMixin.validText(newValue);
+})
+
+const checkData = () => {
+
+    if (messageText.value != null && descriptionСomplaint.value == '') {
+        return
+    }
+
+    let reportedUserId = null;
+    if (route.query.status == 'seller') {
+        reportedUserId = СomplaintChat.value.buyer.id;
+    }
+    if (route.query.status == 'buyer') {
+        reportedUserId = СomplaintChat.value.seller.id;
+    }
+
+    let data = {
+        'text': descriptionСomplaint.value,
+        'reason': reasonСomplaint.value,
+        'complainant_user_id': getUser.value.id,
+        'reported_user_id': reportedUserId,
+        'chat_id': СomplaintChat.value.id,
+        'status': 'wait',
+        'type': 'chat',
+    }
+    console.log(data);
+    createСomplaint(data);
 }
 
 const checkStatus = () => {
@@ -279,6 +370,23 @@ const sendMessage = async (message) => {
         });
         // messages.value.unshift(result.data.data)
         messageValue.value = null;
+    } catch (error) {
+        console.error("Произошла ошибка при выполнении запроса:", error);
+    }
+
+}
+
+const createСomplaint = async (data) => {
+    try {
+        let result = await axiosInstance.post(`api/complaints`, data, {
+            headers: {
+                'Authorization': `Bearer ${getToken.value}`,
+            }
+        });
+        toast.success("Жалоба успешно отправлена!", {
+            autoClose: 2000,
+        });
+        console.log(result.data);
     } catch (error) {
         console.error("Произошла ошибка при выполнении запроса:", error);
     }

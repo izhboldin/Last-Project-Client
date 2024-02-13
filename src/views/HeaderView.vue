@@ -26,6 +26,9 @@
               <li v-if="getUser" class="nav-item">
                 <span class="nav-link" v-if="getUser">Привет, {{getUser.name}}</span>
               </li>
+              <li v-if="getUser" class="nav-item">
+                <span class="nav-link btn" @click="logout()" v-if="getUser">Выйти</span>
+              </li>
             </ul>
           </div>
         </div>
@@ -39,6 +42,7 @@ import { useAuthStore } from '@/stores/authStore.js';
 
 const router = useRouter()
 const { getUser } = storeToRefs(useAuthStore());
+const { logout } = useAuthStore();
 
 </script>
 <style lang="">
