@@ -38,7 +38,7 @@
                                     style="height: 240px; width: 240px;" alt=""
                                     class="img-fluid object-fit-cover rounded-circle me-2 ">
                                 <img v-if="!getUser.image" src="http://localhost:8080/storage/images/no-user-image.webp"
-                                    style="height: 54px; width: 54px;" alt=""
+                                    style="height: 240px; width: 240px;" alt=""
                                     class="img-fluid object-fit-cover rounded-circle me-2">
                             </div>
                             <h3>{{ getUser.name }}</h3>

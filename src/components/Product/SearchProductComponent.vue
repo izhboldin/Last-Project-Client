@@ -40,7 +40,7 @@
                                     <option value="new">Новый</option>
                                 </select>
                             </div>
-                        </div>  
+                        </div>
                         <div v-for="parameter in categories.parameters" class="col-3">
                             <label for="exampleInputEmail1" class="form-label mb-0">{{ parameter.name }}</label>
                             <div class="p-2  input-group">
@@ -80,8 +80,11 @@
                         <div v-for="product in products.data" class="col-3 my-3">
                             <div @click="router.push({ name: 'product', params: { id: product.id } })"
                                 class="cursor-pointer p-3 bg-body">
-                                <img src="https://i.redd.it/ux74bsifrpda1.jpg" class="card-img" alt="..."
-                                    style="max-height: 30vh; object-fit: cover">
+                                <img v-if="product.images[0]" v-bind:src="product.images[0].full_url" class="card-img"
+                                    alt="..." style="height: 26vh; object-fit: cover">
+                                <img v-if="!product.images[0]"
+                                    src="http://localhost:8080/storage/images/no_image_available.png" class="card-img"
+                                    alt="..." style="height: 26vh; object-fit: cover">
                                 <small class="py-2 blockquote-footer">{{ product.category.name }}</small>
                                 <h4 class="py-2 ">{{ product.title }}</h4>
                                 <h6><strong>{{ product.price }} грн.</strong></h6>

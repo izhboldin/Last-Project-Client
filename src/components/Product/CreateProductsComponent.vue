@@ -17,20 +17,82 @@
                             data-bs-toggle="modal" data-bs-target="#exampleModal">Выбрать категорию</button>
 
                         <div v-if="category !== null" class="card" style="width: 24rem;">
-                            <img src="..." class="card-img-top" alt="...">
+
+                            <img v-if="category.image" v-bind:src="category.image.full_url"
+                                class="img-fluid object-fit-cover p-2 " alt="...">
+
+                            <img v-if="!category.image" src="http://localhost:8080/storage/images/no_image_available.png"
+                                class="img-fluid object-fit-cover p-2 " alt="...">
+
                             <div class="card-body p-2">
                                 <h5 class="card-title text-center">{{ category.name }}</h5>
                                 <button type="button" class="form-control btn border" data-bs-toggle="modal"
                                     data-bs-target="#exampleModal">Изменить</button>
                             </div>
                         </div>
-                        <!-- <pre>{{ category }}</pre> -->
                     </div>
-                    <!-- <pre>{{ currentCategory }}</pre> -->
                 </div>
 
                 <div class="container bg-body p-4 mb-2">
                     <h5 class="pb-2">Фото</h5>
+                    <div class="row row-cols-2 row-cols-lg-4 g-2 g-lg-3">
+                        <div class="col">
+                            <div class="p-1 border bg-light" style="height: 260px;">
+                                <div v-if="previewImage[0]" class="w-100 h-100">
+                                    <img :src="previewImage[0]" alt="Превью" class="img-fluid object-fit-cover w-100 h-100">
+                                </div>
+                                <div v-if="!previewImage[0]"
+                                    class="d-flex align-items-center justify-content-center w-100 h-100 ">
+                                    <span class="material-symbols-outlined">image</span>
+                                </div>
+                            </div>
+                            <input type="file" class="form-control" id="photoInput-0" accept="image/*"
+                                @change="handleFileChange">
+                        </div>
+
+                        <div class="col">
+                            <div class="p-1 border bg-light" style="height: 260px;">
+                                <div v-if="previewImage[1]" class="w-100 h-100">
+                                    <img :src="previewImage[1]" alt="Превью" class="img-fluid object-fit-cover w-100 h-100">
+                                </div>
+                                <div v-if="!previewImage[1]"
+                                    class="d-flex align-items-center justify-content-center w-100 h-100 ">
+                                    <span class="material-symbols-outlined">image</span>
+                                </div>
+                            </div>
+                            <input type="file" class="form-control" id="photoInput-1" accept="image/*"
+                                @change="handleFileChange">
+                        </div>
+
+                        <div class="col">
+                            <div class="p-1 border bg-light" style="height: 260px;">
+                                <div v-if="previewImage[2]" class="w-100 h-100">
+                                    <img :src="previewImage[2]" alt="Превью" class="img-fluid object-fit-cover w-100 h-100">
+                                </div>
+                                <div v-if="!previewImage[2]"
+                                    class="d-flex align-items-center justify-content-center w-100 h-100 ">
+                                    <span class="material-symbols-outlined">image</span>
+                                </div>
+                            </div>
+                            <input type="file" class="form-control" id="photoInput-2" accept="image/*"
+                                @change="handleFileChange">
+                        </div>
+
+                        <div class="col">
+                            <div class="p-1 border bg-light" style="height: 260px;">
+                                <div v-if="previewImage[3]" class="w-100 h-100">
+                                    <img :src="previewImage[3]" alt="Превью" class="img-fluid object-fit-cover w-100 h-100">
+                                </div>
+                                <div v-if="!previewImage[3]"
+                                    class="d-flex align-items-center justify-content-center w-100 h-100 ">
+                                    <span class="material-symbols-outlined">image</span>
+                                </div>
+                            </div>
+                            <input type="file" class="form-control" id="photoInput-3" accept="image/*"
+                                @change="handleFileChange">
+                        </div>
+
+                    </div>
                 </div>
 
                 <div class="container bg-body p-4 mb-2">
@@ -98,6 +160,8 @@
                 </div>
 
                 <div class="container bg-body pt-4 pb-2">
+                    <!-- <button type="submit" class="btn btn-primary me-2"
+                        @click="setImgForProduct()">отправить</button> -->
                     <button type="submit" class="btn btn-primary me-2"
                         @click="checkBeforeCreation(name, category, description, price, state, multiselectValue, selectValue)">отправить</button>
                     <button type="button" class="btn btn-secondary" @click="router.go(-1)">назад</button>
@@ -141,8 +205,16 @@
 
                         <div v-for="category in currentCategory" class="col-4">
                             <div class="p-2 card">
-                                <img src="https://i.ucrazy.ru/files/pics/2023.10/2023-10-17-21-53-072.webp" class="card-img"
-                                    alt="..." style="max-height: 20vh; object-fit: cover">
+
+                                <img v-if="category.image" v-bind:src="category.image.full_url" class="card-img"
+                                    style="max-height: 20vh; object-fit: cover" alt="...">
+
+                                <img v-if="!category.image"
+                                    src="http://localhost:8080/storage/images/no_image_available.png" class="card-img"
+                                    style="max-height: 20vh; object-fit: cover" alt="...">
+
+                                <!-- <img src="https://i.ucrazy.ru/files/pics/2023.10/2023-10-17-21-53-072.webp" class="card-img"
+                                    alt="..." style="max-height: 20vh; object-fit: cover"> -->
                                 <div class="card-body p-1">
                                     <h4 class="card-title text-center">{{ category.name }}</h4>
                                 </div>
@@ -171,6 +243,7 @@ import { RouterView, useRoute, useRouter } from 'vue-router'
 import { storeToRefs } from 'pinia'
 import { useAuthStore } from '@/stores/authStore.js';
 import axiosInstance from '@/services/axios.js';
+import axiosInstanceForImg from '@/services/axiosForImg.js';
 import { productValidMixin } from '@/services/mixins/productValidMixin.js';
 
 import { toast } from 'vue3-toastify';
@@ -204,6 +277,47 @@ const messageDescription = ref(null);
 const messagePrice = ref(null);
 const messagePhone = ref(null);
 const messageCheck = ref(null);
+
+const selectedFile = ref([]);
+const previewImage = ref([]);
+
+
+const handleFileChange = (event) => {
+    console.log(event.target.id);
+    const fileId = event.target.id;
+    const fileIndex = fileId.split('-');
+    const file = event.target.files[0];
+
+    if (file) {
+        if (['image/jpeg', 'image/png'].includes(file.type) && file.size <= 5242880) {
+
+            const existingFileIndex = selectedFile.value.findIndex(item => item.name === fileIndex[1]);
+
+            if (existingFileIndex === -1) {
+                selectedFile.value.push({
+                    index: fileIndex[1],
+                    file: file
+                });
+            }
+            else {
+                selectedFile.value[existingFileIndex].file = file;
+            }
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImage.value[fileIndex[1]] = e.target.result;
+            };
+
+            reader.readAsDataURL(file);
+        } else {
+            toast.error("Формат изображения должен быть JPEG или PNG, размер не должен превышать 5 МБ!", { autoClose: 2000 });
+            event.target.value = '';
+        }
+    } else {
+        previewImage.value[fileIndex[1]] = null;
+        selectedFile.value = null;
+    }
+}
 
 watch(category, newValue => {
     multiselectValue.value = {};
@@ -354,11 +468,42 @@ const createProduct = async (data) => {
         toast.success("Объявление успешно создано!", {
             autoClose: 2000,
         });
-        router.push({ name: 'yourWaitProducts' })
+        setImgForProduct(result.data.id)
     } catch (error) {
         console.error("Произошла ошибка при выполнении запроса:", error);
     }
 }
+
+const setImgForProduct = async (id) => {
+    try {
+        if (!selectedFile.value || selectedFile.value.length == 0) {
+            router.push({ name: 'yourWaitProducts' })
+            return;
+        }
+
+        const formData = new FormData()
+        selectedFile.value.forEach(el => {
+            if (selectedFile.value[el.index]) {
+                formData.append(`images[${el.index}][file]`, el.file);
+            }
+        })
+
+
+        let result = await axiosInstanceForImg.post(`/api/product/${id}/images`, formData, {
+            headers: {
+                'Authorization': `Bearer ${getToken.value}`,
+                'Content-Type': 'multipart/form-data',
+            },
+        });
+        console.log(result.data);
+
+        router.push({ name: 'yourWaitProducts' })
+        // toast.success("Картинка успешно изменена!", { autoClose: 2000 });
+    } catch (error) {
+        console.error("Произошла ошибка при выполнении запроса:", error);
+    }
+}
+
 onMounted(() => {
     getAllCategories();
 });

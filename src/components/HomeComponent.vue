@@ -40,8 +40,10 @@
                 <div v-for="product in products.data" class="col-3 my-3">
                     <div @click="router.push({ name: 'product', params: { id: product.id } })"
                         class="cursor-pointer p-3 bg-body">
-                        <img src="https://i.redd.it/ux74bsifrpda1.jpg" class="card-img" alt="..."
-                            style="max-height: 30vh; object-fit: cover">
+                            <img v-if="product.images[0]" v-bind:src="product.images[0].full_url" class="card-img" alt="..."
+                                style="height: 26vh; object-fit: cover">
+                            <img v-if="!product.images[0]" src="http://localhost:8080/storage/images/no_image_available.png" class="card-img" alt="..."
+                                style="height: 26vh; object-fit: cover">
                         <small class="py-2 blockquote-footer">{{ product.category.name }}</small>
                         <h4 class="py-2 ">{{ product.title }}</h4>
                         <h6><strong>{{ product.price }} грн.</strong></h6>
@@ -60,42 +62,6 @@
         </div>
 
     </div>
-    <!-- <button type="button" class="form-control btn border" data-bs-toggle="modal" data-bs-target="#exampleModal">Выбрать
-        категорию</button> -->
-
-    <!-- <div class="modal fade modal-lg" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <button class="btn btn-outline-primary btn-sm mb-2 w-100" v-if="parentId !== null || !isNaN(parentId)"
-                        @click="getBack()">back</button>
-
-                    <div v-if="currentCategory !== null" class="row g-2">
-
-                        <div v-for="category in currentCategory" class="col-4 p-2 card">
-                            <img src="https://i.ucrazy.ru/files/pics/2023.10/2023-10-17-21-53-072.webp" class="card-img"
-                                alt="..." style="max-height: 20vh; object-fit: cover">
-                            <div class="card-body p-1">
-                                <h4 class="card-title text-center">{{ category.name }}</h4>
-                            </div>
-                            <div class="card-body d-flex justify-content-between p-1">
-                                <button v-if="category.children.length !== 0" class="btn btn-outline-primary btn-sm"
-                                    @click="receive(category.children, category.parent_category_id)">Далее</button>
-                                <button v-if="category.parent_category_id !== null && category.children.length === 0"
-                                    class="btn btn-outline-success btn-sm" @click="getDataCategory(category.id)"
-                                    aria-label="Close" data-bs-dismiss="modal">Выбрать</button>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> -->
 </template>
 <script setup>
 import { ref, onMounted, watch } from 'vue'
@@ -135,7 +101,7 @@ const getProducts = async () => {
         });
         products.value = result.data;
 
-        console.log(result.data);
+        console.log(result.data.data);
     } catch (error) {
         console.error("Произошла ошибка при выполнении запроса:", error);
     }

@@ -20,9 +20,12 @@
 
 <script setup>
 import { ref, watch } from 'vue';
+import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore.js';
 import { validationMixin } from '@/services/mixins/validationMixin';
+
+const { getUser, getToken } = storeToRefs(useAuthStore());
 
 const router = useRouter()
 const { login, getDataUser } = useAuthStore();
@@ -39,12 +42,9 @@ watch(email, newValue => {
 watch(password, newValue => {
     return messagePassword.value = validationMixin.validPassword(newValue)
 })
-
-// const qwe = () =>{
-//     getDataUser().then(() => {
-//         router.push({ name: 'register' })
-//     })
-// }
+watch(getToken, newValue => {
+    router.push({ name: 'home' })
+})
 
 
 const request = (email, pass) => {
@@ -62,7 +62,7 @@ const request = (email, pass) => {
         'password': pass,
     }
     login(data)
-    router.push({ name: 'home' })
+    // router.push({ name: 'home' })
 }
 </script>
 <style lang="">

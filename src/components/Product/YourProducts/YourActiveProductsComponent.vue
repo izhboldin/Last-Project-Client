@@ -7,8 +7,11 @@
             <div class="row g-0 justify-content-center">
 
                 <div class="col-md-4">
-                    <img src="https://ireland.apollo.olxcdn.com:443/v1/files/zo9y2rkxi8941-UA/image;s=1000x700"
+                    <img v-if="product.images[0]" v-bind:src="product.images[0].full_url"
                         class="img-fluid rounded object-fit-cover m-1" style="width: 30vh; height: 15vh" alt="...">
+                    <img v-if="!product.images[0]" src="http://localhost:8080/storage/images/no_image_available.png"
+                        class="img-fluid rounded object-fit-cover m-1" style="width: 30vh; height: 15vh" alt="...">
+
                 </div>
 
                 <div class="col-md-8">
@@ -97,7 +100,7 @@ const getProduct = async () => {
                 'Authorization': `Bearer ${getToken.value}`,
             }
         });
-        products.value = result.data;
+        products.value = result.data.data;
 
         console.log(products.value);
     } catch (error) {
@@ -115,8 +118,8 @@ const deleteProduct = async (data) => {
         });
         getProduct();
         toast.success("Объявление успешно удалено!", {
-        autoClose: 2000,
-    });
+            autoClose: 2000,
+        });
 
     } catch (error) {
         console.error("Произошла ошибка при выполнении запроса:", error);

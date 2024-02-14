@@ -40,9 +40,28 @@
 
                 <div class="col-8">
                     <div class="p-3 bg-body mb-3">
+                        <template v-if="product.images.length == 0">
+
+                            <div class="p-3 text-center">
+                                <div style="height: 44vh;">
+                                    <div class="d-flex align-items-center justify-content-center w-100 h-100 ">
+                                        <span class="material-symbols-outlined">image</span>
+                                    </div>
+                                </div>
+                                <!-- <img src="http://localhost:8080/storage/images/no_image_available.png"
+                                    class="img-fluid rounded object-fit-cover" style="height: 44vh;" alt=""> -->
+                            </div>
+                        </template>
+
+                        <template v-if="!product.images.length == 0">
+                            <div class="p-3 text-center">
+                                <Image :src="product.images[first].full_url" alt="Image" height="420" preview />
+                            </div>
+
+                            <Paginator v-model:first="first" :rows="1" :totalRecords="product.images.length"
+                                template="FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink" />
+                        </template>
                         <div>
-                            <img src="https://ireland.apollo.olxcdn.com:443/v1/files/ygmhic4pl14b-UA/image;s=1000x667"
-                                class="img-fluid rounded object-fit-cover" style="max-height: 60vh;" alt="">
                         </div>
                     </div>
                     <div class="p-3 bg-body">
@@ -130,6 +149,10 @@ import { useAuthStore } from '@/stores/authStore.js';
 import { format } from 'date-fns';
 
 import IconEnvelope from '@/components/icons/IconEnvelope.vue';
+import Image from 'primevue/image';
+import Paginator from 'primevue/paginator';
+const first = ref(0);
+
 import { validationMixin } from '@/services/mixins/validationMixin.js';
 
 import { toast } from 'vue3-toastify';
