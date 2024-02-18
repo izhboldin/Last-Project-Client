@@ -256,7 +256,6 @@ const checkData = () => {
         'status': 'wait',
         'type': 'chat',
     }
-    console.log(data);
     createСomplaint(data);
 }
 
@@ -386,7 +385,6 @@ const createСomplaint = async (data) => {
         toast.success("Жалоба успешно отправлена!", {
             autoClose: 2000,
         });
-        console.log(result.data);
     } catch (error) {
         console.error("Произошла ошибка при выполнении запроса:", error);
     }
@@ -404,6 +402,9 @@ onMounted(() => {
     Echo.channel(`chat`)
         .listen('MessageSent', (e) => {
             messageValueBroadcast.value = e;
+            if(messages.length == 0){
+                messages.value == null;
+            }
             if (e.message.chat == route.query.chatId) {
                 messages.value.unshift(e.message)
             }

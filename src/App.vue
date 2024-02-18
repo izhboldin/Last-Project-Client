@@ -18,6 +18,8 @@ const { getDataUser } = useAuthStore();
 const route = useRoute();
 const name = ref('qwe')
 
+
+
 onMounted(() => {
   getDataUser()
 })

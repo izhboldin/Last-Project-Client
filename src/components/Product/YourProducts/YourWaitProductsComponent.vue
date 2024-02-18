@@ -102,7 +102,6 @@ const getProduct = async () => {
         });
         products.value = result.data.data;
 
-        console.log(products.value);
     } catch (error) {
         console.error("Произошла ошибка при выполнении запроса:", error);
     }
@@ -110,7 +109,6 @@ const getProduct = async () => {
 
 const deleteProduct = async (data) => {
     try {
-        console.log(data);
         let result = await axiosInstance.delete(`api/products/${data}`, {
             headers: {
                 'Authorization': `Bearer ${getToken.value}`,

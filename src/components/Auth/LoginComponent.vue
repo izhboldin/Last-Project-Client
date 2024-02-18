@@ -49,11 +49,6 @@ watch(getToken, newValue => {
 
 const request = (email, pass) => {
     if (email === '' || pass === '' || messageEmail.value !== null || messagePassword.value !== null) {
-        console.log(email === '');
-        console.log(pass === '');
-        console.log(messageEmail.value !== null);
-        console.log(messagePassword.value !== null);
-        console.log(messagePassword.value);
         return
     }
     

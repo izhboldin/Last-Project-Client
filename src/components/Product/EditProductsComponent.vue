@@ -16,37 +16,113 @@
             <template v-if="getUser && product">
 
                 <div class="row row-cols-2 row-cols-lg-4 g-2 g-lg-3">
-                    <div v-for="index in 4" :key="index" class="col">
-                        <!-- Use conditional logic to display images or placeholder -->
+                    <div class="col">
                         <div class="p-1 border bg-light" style="height: 260px;">
-                            <div v-if="previewImage[index-1]" class="w-100 h-100">
-                                <img :src="previewImage[index-1]" alt="Превью" class="img-fluid object-fit-cover w-100 h-100">
+                            <div v-if="previewImage[0]" class="w-100 h-100">
+                                <img :src="previewImage[0]" alt="Превью" class="img-fluid object-fit-cover w-100 h-100">
                             </div>
-                            <div v-else-if="product.images[index-1]" class="w-100 h-100">
-                                <img :src="product.images[index-1].full_url" alt="Превью"
+                            <div v-if="!previewImage[0] && product.images[0]" class="w-100 h-100">
+                                <img :src="product.images[0].full_url" alt="Превью"
                                     class="img-fluid object-fit-cover w-100 h-100">
                             </div>
-                            <div v-else class="d-flex align-items-center justify-content-center w-100 h-100">
+                            <div v-if="!previewImage[0] && !product.images[0]"
+                                class="d-flex align-items-center justify-content-center w-100 h-100 ">
                                 <span class="material-symbols-outlined">image</span>
                             </div>
                         </div>
                         <div class="input-group mb-3">
-                            <!-- Use conditional logic to display file input or update input based on image existence -->
-                            <input v-if="!product.images[index-1]" type="file" class="form-control"
-                                :id="'photoInput-' + index-1" accept="image/*" @change="handleFileChange">
-                            <input v-else type="file" class="form-control" :id="product.images[index-1].id + '-' + index-1"
-                                accept="image/*" @change="handleFileUpdate">
-                            <!-- Use conditional logic to display delete button based on image existence -->
-                            <button v-if="product.images[index-1]" @click="deleteImage(product.images[index-1].id, index-1)"
-                                type="button" class="btn btn-danger input-group-text">del</button>
+                            <input v-if="!product.images[0]" type="file" class="form-control" id="photoInput-0"
+                                accept="image/*" @change="handleFileChange">
+
+                            <input v-if="product.images[0]" type="file" class="form-control"
+                                :id="product.images[0].id + '-0'" accept="image/*" @change="handleFileUpdate">
+
+                            <button v-if="product.images[0]" @click="deleteImage(product.images[0].id, 0)" type="button"
+                                class=" btn btn-danger input-group-text">del</button>
                         </div>
                     </div>
+
+                    <div class="col">
+                        <div class="p-1 border bg-light" style="height: 260px;">
+                            <div v-if="previewImage[1]" class="w-100 h-100">
+                                <img :src="previewImage[1]" alt="Превью" class="img-fluid object-fit-cover w-100 h-100">
+                            </div>
+                            <div v-if="!previewImage[1] && product.images[1]" class="w-100 h-100">
+                                <img :src="product.images[1].full_url" alt="Превью"
+                                    class="img-fluid object-fit-cover w-100 h-100">
+                            </div>
+                            <div v-if="!previewImage[1] && !product.images[1]"
+                                class="d-flex align-items-center justify-content-center w-100 h-100 ">
+                                <span class="material-symbols-outlined">image</span>
+                            </div>
+                        </div>
+                        <div class="input-group mb-3">
+                            <input v-if="!product.images[1]" type="file" class="form-control" id="photoInput-1"
+                                accept="image/*" @change="handleFileChange">
+
+                            <input v-if="product.images[1]" type="file" class="form-control"
+                                :id="product.images[1].id + '-1'" accept="image/*" @change="handleFileUpdate">
+
+                            <button v-if="product.images[1]" @click="deleteImage(product.images[1].id, 1)" type="button"
+                                class=" btn btn-danger input-group-text">del</button>
+                        </div>
+                    </div>
+
+                    <div class="col">
+                        <div class="p-1 border bg-light" style="height: 260px;">
+                            <div v-if="previewImage[2]" class="w-100 h-100">
+                                <img :src="previewImage[2]" alt="Превью" class="img-fluid object-fit-cover w-100 h-100">
+                            </div>
+                            <div v-if="!previewImage[2] && product.images[2]" class="w-100 h-100">
+                                <img :src="product.images[2].full_url" alt="Превью"
+                                    class="img-fluid object-fit-cover w-100 h-100">
+                            </div>
+                            <div v-if="!previewImage[2] && !product.images[2]"
+                                class="d-flex align-items-center justify-content-center w-100 h-100 ">
+                                <span class="material-symbols-outlined">image</span>
+                            </div>
+                        </div>
+                        <div class="input-group mb-3">
+                            <input v-if="!product.images[2]" type="file" class="form-control" id="photoInput-2"
+                                accept="image/*" @change="handleFileChange">
+
+                            <input v-if="product.images[2]" type="file" class="form-control"
+                                :id="product.images[2].id + '-2'" accept="image/*" @change="handleFileUpdate">
+
+                            <button v-if="product.images[2]" @click="deleteImage(product.images[2].id, 2)" type="button"
+                                class=" btn btn-danger input-group-text">del</button>
+                        </div>
+                    </div>
+
+                    <div class="col">
+                        <div class="p-1 border bg-light" style="height: 260px;">
+                            <div v-if="previewImage[3]" class="w-100 h-100">
+                                <img :src="previewImage[3]" alt="Превью" class="img-fluid object-fit-cover w-100 h-100">
+                            </div>
+                            <div v-if="!previewImage[3] && product.images[3]" class="w-100 h-100">
+                                <img :src="product.images[3].full_url" alt="Превью"
+                                    class="img-fluid object-fit-cover w-100 h-100">
+                            </div>
+                            <div v-if="!previewImage[3] && !product.images[3]"
+                                class="d-flex align-items-center justify-content-center w-100 h-100 ">
+                                <span class="material-symbols-outlined">image</span>
+                            </div>
+                        </div>
+                        <div class="input-group mb-3">
+                            <input v-if="!product.images[3]" type="file" class="form-control" id="photoInput-3"
+                                accept="image/*" @change="handleFileChange">
+
+                            <input v-if="product.images[3]" type="file" class="form-control"
+                                :id="product.images[3].id + '-3'" accept="image/*" @change="handleFileUpdate">
+
+                            <button v-if="product.images[3]" @click="deleteImage(product.images[3].id, 3)" type="button"
+                                class=" btn btn-danger input-group-text">del</button>
+                        </div>
+                    </div>
+
+
                 </div>
-
             </template>
-
-            {{ selectedFile }}
-            <!-- {{ previewImage }} -->
         </div>
 
         <div class="container bg-body p-4 mb-2">
@@ -91,12 +167,12 @@
             <pre>selectValue: {{ selectValue }}</pre> -->
         </div>
 
-        <div class="container bg-body p-4 mb-2">
+        <!-- <div class="container bg-body p-4 mb-2">
             <div class="mb-1">
                 <div class="form-text">Местоположение*</div>
                 <input type="text" class="form-control">
             </div>
-        </div>
+        </div> -->
 
         <div class="container bg-body pt-4 pb-2">
             <button type="submit" class="btn btn-primary me-2"
@@ -158,13 +234,12 @@ const handleFileChange = (event) => {
 }
 
 const handleFile = (event) => {
-    console.log(event.target.id);
     const fileId = event.target.id;
     const fileIndex = fileId.split('-');
     const file = event.target.files[0];
 
     if (file) {
-        if (['image/jpeg', 'image/png'].includes(file.type) && file.size <= 5242880) {
+        if (['image/jpeg', 'image/png', 'image/webp'].includes(file.type) && file.size <= 5242880) {
 
             selectedFile.value = file;
             const reader = new FileReader();
@@ -174,7 +249,7 @@ const handleFile = (event) => {
             };
             createImage(fileIndex[1], fileIndex[0])
         } else {
-            toast.error("Формат изображения должен быть JPEG или PNG, размер не должен превышать 5 МБ!", { autoClose: 2000 });
+            toast.error("Формат изображения должен быть JPEG, или PNG, или WEBP, размер не должен превышать 5 МБ!", { autoClose: 2000 });
             event.target.value = '';
         }
     } else {
@@ -293,6 +368,8 @@ const createImage = async (index, imageId) => {
                     'Content-Type': 'multipart/form-data',
                 },
             });
+            toast.success("Картинка успешно обновлена!", { autoClose: 2000 });
+
         }
         else {
             result = await axiosInstanceForImg.post(`/api/product/${route.params.id}/images`, formData, {
@@ -301,11 +378,10 @@ const createImage = async (index, imageId) => {
                     'Content-Type': 'multipart/form-data',
                 },
             });
+            toast.success("Картинка успешно создана!", { autoClose: 2000 });
         }
-        console.log(result.data);
         product.value.images[index] = result.data.data[0];
 
-        toast.success("Картинка успешно создана!", { autoClose: 2000 });
     } catch (error) {
         console.error("Произошла ошибка при выполнении запроса:", error);
     }
@@ -394,7 +470,6 @@ const getProduct = async (data) => {
             }
         });
         product.value = result.data.data;
-        console.log(product.value);
 
     } catch (error) {
         console.error("Произошла ошибка при выполнении запроса:", error);

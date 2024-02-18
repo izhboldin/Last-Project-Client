@@ -7,9 +7,11 @@ import Cookies from 'js-cookie';
 export const useAuthStore = defineStore('alerts', () => {
     const user = ref(null);
     const token = ref(null);
+    const isToken = ref(Cookies.get("token") != null);
 
     const getUser = computed(() => user.value)
     const getToken = computed(() => token.value)
+    const getIsToken = computed(() => isToken.value)
 
     const register = async (date) => {
         try {
@@ -19,6 +21,7 @@ export const useAuthStore = defineStore('alerts', () => {
             if (result.data.user && result.data.token) {
                 user.value = result.data.user;
                 token.value = result.data.token;
+                isToken.value = true;
                 Cookies.set('token', token.value);
             }
         } catch (error) {
@@ -33,6 +36,7 @@ export const useAuthStore = defineStore('alerts', () => {
             if (result.data.user && result.data.token) {
                 user.value = result.data.user;
                 token.value = result.data.token;
+                isToken.value = true;
                 Cookies.set('token', token.value);
             }
         } catch (error) {
@@ -86,6 +90,7 @@ export const useAuthStore = defineStore('alerts', () => {
                 });
             user.value = null;
             token.value = null;
+            isToken.value = false;
             Cookies.remove('token');
         } catch (error) {
             console.error("Произошла ошибка при выходе из аккаунта:", error);
@@ -99,6 +104,7 @@ export const useAuthStore = defineStore('alerts', () => {
         getToken,
         getDataUser,
         isBan,
-        logout
+        logout,
+        getIsToken
     }
 })

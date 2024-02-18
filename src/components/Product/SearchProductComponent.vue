@@ -95,7 +95,7 @@
                         </h4>
 
                         <div class="">
-                            <Paginator v-model:first="paginate" :rows="products.per_page" :totalRecords="products.total">
+                            <Paginator v-model:first="paginate" :rows="products.meta.per_page" :totalRecords="products.meta.total">
                             </Paginator>
                         </div>
 
@@ -294,16 +294,15 @@ const search = () => {
     }
 
     if (paginate.value && products.value) {
-        if (paginate.value < products.value.per_page) {
+        if (paginate.value < products.value.meta.per_page) {
             query.page = 1
         }
         else {
-            query.page = (paginate.value / products.value.per_page) + 1;;
+            query.page = (paginate.value / products.value.meta.per_page) + 1;;
         }
     }
 
     query.options = getOptionsArr();
-    console.log(isEqualValueCategoryId.value);
     // if (isEqualValueCategoryId.value === true) {
 
     // }
@@ -351,7 +350,6 @@ const getQuery = (query) => {
         valueCategoryId.value = query.categoryId;
     }
     if (query.options) {
-        // console.log(query.options);
         setOptionsFromQuery(query.options);
     }
 
@@ -392,7 +390,6 @@ const getCategories = async (data = null) => {
                 'Authorization': `Bearer ${getToken.value}`,
             }
         });
-        console.log(result.data);
         data ? categories.value = result.data.data : categories.value = result.data
     } catch (error) {
         console.error("Произошла ошибка при выполнении запроса:", error);
@@ -451,8 +448,7 @@ const getProducts = async (data = null) => {
             }
         });
         products.value = result.data;
-
-        console.log(result.data);
+console.log(result.data);
     } catch (error) {
         console.error("Произошла ошибка при выполнении запроса:", error);
     }

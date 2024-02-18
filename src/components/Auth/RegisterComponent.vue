@@ -68,7 +68,6 @@ watch(password, newValue => {
   return messagePassword.value = validationMixin.validPassword(newValue)
 })
 watch(phone, newValue => {
-  console.log(newValue);
   return messagePhone.value = validationMixin.validPhone(newValue)
 })
 watch(passwordConf, newValue => {

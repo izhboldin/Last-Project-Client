@@ -86,7 +86,6 @@ const getAllCategories = async () => {
             return
         }
         categories.value = result.data;
-        console.log(categories.value);
     } catch (error) {
         console.error("Произошла ошибка при выполнении запроса:", error);
     }
@@ -101,7 +100,6 @@ const getProducts = async () => {
         });
         products.value = result.data;
 
-        console.log(result.data.data);
     } catch (error) {
         console.error("Произошла ошибка при выполнении запроса:", error);
     }

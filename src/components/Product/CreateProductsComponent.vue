@@ -137,12 +137,12 @@
             <pre>selectValue: {{ selectValue }}</pre> -->
                 </div>
 
-                <div class="container bg-body p-4 mb-2">
+                <!-- <div class="container bg-body p-4 mb-2">
                     <div class="mb-1">
                         <div class="form-text">Местоположение*</div>
                         <input type="text" class="form-control">
                     </div>
-                </div>
+                </div> -->
 
                 <div class="container bg-body p-4 mb-2">
                     <div class="mb-3">
@@ -283,13 +283,12 @@ const previewImage = ref([]);
 
 
 const handleFileChange = (event) => {
-    console.log(event.target.id);
     const fileId = event.target.id;
     const fileIndex = fileId.split('-');
     const file = event.target.files[0];
 
     if (file) {
-        if (['image/jpeg', 'image/png'].includes(file.type) && file.size <= 5242880) {
+        if (['image/jpeg', 'image/png', 'image/webp'].includes(file.type) && file.size <= 5242880) {
 
             const existingFileIndex = selectedFile.value.findIndex(item => item.name === fileIndex[1]);
 
@@ -310,7 +309,7 @@ const handleFileChange = (event) => {
 
             reader.readAsDataURL(file);
         } else {
-            toast.error("Формат изображения должен быть JPEG или PNG, размер не должен превышать 5 МБ!", { autoClose: 2000 });
+            toast.error("Формат изображения должен быть JPEG, или PNG, или WEBP, размер не должен превышать 5 МБ!", { autoClose: 2000 });
             event.target.value = '';
         }
     } else {
@@ -324,13 +323,11 @@ watch(category, newValue => {
     selectValue.value = {};
     newValue.parameters.forEach(element => {
         if (element.type === 'multiselect') {
-            // console.log(123);
             multiselectValue.value[`${element.id}`] = [];
         }
         if (element.type === 'select') {
             selectValue.value[`${element.id}`] = '';
         }
-        console.log(element.id, element.type);
     });
 })
 
@@ -368,8 +365,6 @@ const getDataCategory = async (data) => {
             return
         }
         category.value = result.data.data;
-        console.log(result.data);
-        console.log(category.value);
     } catch (error) {
         console.error("Произошла ошибка при выполнении запроса:", error);
     }
@@ -420,7 +415,6 @@ const checkBeforeCreation = (name, category, description, price, state, multisel
     }
 
     let options = [];
-    console.log(multiselect);
     for (const key in multiselect) {
         if (multiselect[key].length === 0) {
             return messageCheck.value = 'Заполните всю дополнительну информацию';
@@ -438,8 +432,6 @@ const checkBeforeCreation = (name, category, description, price, state, multisel
         }
     }
     messageCheck.value = ''
-
-    console.log('класс');
 
     const data = {
         'title': name,
@@ -464,7 +456,6 @@ const createProduct = async (data) => {
                 'Authorization': `Bearer ${getToken.value}`,
             }
         });
-        console.log(result.data);
         toast.success("Объявление успешно создано!", {
             autoClose: 2000,
         });
@@ -495,7 +486,6 @@ const setImgForProduct = async (id) => {
                 'Content-Type': 'multipart/form-data',
             },
         });
-        console.log(result.data);
 
         router.push({ name: 'yourWaitProducts' })
         // toast.success("Картинка успешно изменена!", { autoClose: 2000 });

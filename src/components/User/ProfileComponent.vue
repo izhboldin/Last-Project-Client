@@ -42,14 +42,20 @@
                                     class="img-fluid object-fit-cover rounded-circle me-2">
                             </div>
                             <h3>{{ getUser.name }}</h3>
+                            <small class="py-2 blockquote-footer">На сайте с: {{ format(new
+                                Date(getUser.created_at), "yyyy-MM-dd") }}</small>
                             <p>почта: {{ getUser.email }}</p>
+                            <p>телефон: {{ getUser.phone }}</p>
                         </template>
                     </div>
                 </div>
                 <div class="col-3">
                     <div class="p-3 bg-body mb-3" style="min-height: 80vh">
-                        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">Изменить
+                        <button class="btn btn-success mb-2" data-bs-toggle="modal" data-bs-target="#exampleModal">Изменить
                             картинку</button>
+                            <template v-if="getUser">
+                                <button v-if="getUser.role == 'admin'" class="btn btn-success" @click="getPdf">Получить PDF</button>
+                            </template>
                     </div>
                 </div>
             </div>
@@ -105,11 +111,8 @@ const getImgForUser = async () => {
             return;
         }
 
-        
-
         const formData = new FormData()
         formData.append('images[0][file]', selectedFile.value);
-    
 
         let result = await axiosInstanceForImg.post('/api/user/images', formData, {
             headers: {
@@ -118,14 +121,28 @@ const getImgForUser = async () => {
             },
         });
 
-        console.log(result.data);
+        getUser.value.image = result.data.data[0]
         toast.success("Картинка успешно изменена!", { autoClose: 2000 });
     } catch (error) {
         console.error("Произошла ошибка при выполнении запроса:", error);
     }
 }
 
+const getPdf = async () => {
+    try {
+        let result = await axiosInstance.get(`api/generate-pdf`, {
+            headers: {
+                'Authorization': `Bearer ${getToken.value}`,
+            }
+        });
+
+    } catch (error) {
+        console.error("Произошла ошибка при выполнении запроса:", error);
+    }
+}
+
 onMounted(() => {
+    
 
 });
 
